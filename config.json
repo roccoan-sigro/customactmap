@@ -41,37 +41,7 @@
     "execute": {
       "inArguments": [],
       "outArguments": [],
-      "url": "https://roccoan-sigro.github.io/customactmap/",
-      "verb": "POST",
-      "format": "json",
-      "useJwt": false,
-      "timeout": 90000,
-      "retryCount": 5,
-      "retryDelay": 100
+      "url": "https://roccoan-sigro.github.io/customactmap/"
     }
-  },
-  "configurationArguments": {
-    "persisted": [
-      {
-        "name": "minLatitude",
-        "dataType": "Text",
-        "isNullable": false
-      },
-      {
-        "name": "maxLatitude",
-        "dataType": "Text",
-        "isNullable": false
-      },
-      {
-        "name": "minLongitude",
-        "dataType": "Text",
-        "isNullable": false
-      },
-      {
-        "name": "maxLongitude",
-        "dataType": "Text",
-        "isNullable": false
-      }
-    ]
   }
 }
