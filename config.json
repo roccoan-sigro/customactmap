@@ -41,7 +41,7 @@
     "execute": {
       "inArguments": [],
       "outArguments": [],
-      "url": "https://<YOUR-HEROKU-APP-URL>/execute",
+      "url": "https://roccoan-sigro.github.io/customactmap/",
       "verb": "POST",
       "format": "json",
       "useJwt": false,
