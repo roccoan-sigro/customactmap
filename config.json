@@ -31,12 +31,11 @@
     }
   ],
   "userInterfaces": {
-    "runningModal": {
-      "url": "runningModal.html"
-    },
-    "runningHover": {
-      "url": "runningHover.html"
-    }
+    "configModal": {
+			"height": 500,
+			"width": 600,
+			"fullscreen": true
+		}
   },
   "arguments": {
     "execute": {
