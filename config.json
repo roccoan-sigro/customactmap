@@ -1,4 +1,9 @@
 {
+  "workflowApiVersion": "1.1",
+	"metaData": {
+		"icon": "images/icon.png",
+		"category": "message"
+	},
   "key": "seleziona-area-sulla-mappa",
   "type": "EVENT",
   "lang": {
