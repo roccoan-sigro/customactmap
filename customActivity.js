@@ -4,6 +4,11 @@ define('customActivityModule', ['postmonger'], function (Postmonger) {
     var connection = new Postmonger.Session();
     var payload = {};
 
+    // Trigger the 'ready' event when the iframe is initially loaded
+    if (window.location === window.parent.location) {
+        connection.trigger('ready');
+    }
+
     // Wait for the DOM to be ready before initializing
     $(document).ready(onRender);
 
