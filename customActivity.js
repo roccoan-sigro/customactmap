@@ -1,10 +1,11 @@
-define(['postmonger'], function (Postmonger) {
+define('customActivityModule', ['postmonger'], function (Postmonger) {
     'use strict';
 
     var connection = new Postmonger.Session();
     var payload = {};
 
-    $(window).ready(onRender);
+    // Wait for the DOM to be ready before initializing
+    $(document).ready(onRender);
 
     connection.on('requestedTokens', onRequestedTokens);
     connection.on('requestedEndpoints', onRequestedEndpoints);
@@ -58,27 +59,26 @@ define(['postmonger'], function (Postmonger) {
     }
 
     function save() {
-    // Handling the 'Next' button click
+        // Handling the 'Next' button click
 
-    // Assuming your DE fields are named 'latitude' and 'longitude'
-    var latitude = parseFloat('{{Contact.Attribute.PhysicalEmailAddress.latitude}}');
-    var longitude = parseFloat('{{Contact.Attribute.PhysicalEmailAddress.longitude}}');
+        // Assuming your DE fields are named 'latitude' and 'longitude'
+        var latitude = parseFloat('{{Contact.Attribute.PhysicalEmailAddress.latitude}}');
+        var longitude = parseFloat('{{Contact.Attribute.PhysicalEmailAddress.longitude}}');
 
-    // Check if the contact's coordinates fall within the selected range
-    if (
-        latitude >= payload.latitudeMin &&
-        latitude <= payload.latitudeMax &&
-        longitude >= payload.longitudeMin &&
-        longitude <= payload.longitudeMax
-    ) {
-        // Contact falls within the selected range, trigger the 'selectedMapArea' outcome
-        connection.trigger('selectOutcome', 'selectedMapArea');
-    } else {
-        // Contact does not fall within the selected range, trigger the default outcome or another outcome as needed
-        connection.trigger('selectOutcome', 'defaultOutcome');
+        // Check if the contact's coordinates fall within the selected range
+        if (
+            latitude >= payload.latitudeMin &&
+            latitude <= payload.latitudeMax &&
+            longitude >= payload.longitudeMin &&
+            longitude <= payload.longitudeMax
+        ) {
+            // Contact falls within the selected range, trigger the 'selectedMapArea' outcome
+            connection.trigger('selectOutcome', 'selectedMapArea');
+        } else {
+            // Contact does not fall within the selected range, trigger the default outcome or another outcome as needed
+            connection.trigger('selectOutcome', 'defaultOutcome');
+        }
     }
-}
-
 
     // Utility function to get query parameters from the URL
     function getQueryParam(param) {
