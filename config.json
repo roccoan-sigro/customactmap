@@ -39,13 +39,16 @@
     "execute": {
       "inArguments": [
         {
-          "contactIdentifier": "{{Contact.Key}}"
+          "subscriberKey": "{{Contact.Attribute.JourneyEntrySource.SubscriberKey}}"
         },
         {
-          "emailAddress": "{{InteractionDefaults.EmailAddress}}"
+          "emailAddress": "{{Contact.Attribute.JourneyEntrySource.EmailAddress}}"
         },
         {
-          "phone": "{{InteractionDefaults.Phone}}"
+          "phone": "{{Contact.Attribute.JourneyEntrySource.Phone}}"
+        },
+        {
+          "address": "{{Contact.Attribute.JourneyEntrySource.PhisicalMailingAddress}}"
         }
       ],
       "outArguments": [],
