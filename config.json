@@ -5,9 +5,9 @@
 		"category": "message"
 	},
   "key": "seleziona-area-sulla-mappa",
-  "type": "EVENT",
+  "type": "MultiCriteriaDecision",
   "lang": {
-    "en-US": {
+    "it-IT": {
       "name": "Seleziona Area sulla Mappa",
       "description": "Custom Split activity that makes a decision based on selected map area"
     }
@@ -18,7 +18,7 @@
         "branchResult": "selectedMapArea"
       },
       "metaData": {
-        "label": "Selected Map Area"
+        "label": "Area Selezionata sulla Mappa"
       }
     },
     {
@@ -26,7 +26,7 @@
         "branchResult": "remainingContacts"
       },
       "metaData": {
-        "label": "Remaining Contacts"
+        "label": "Contatti Esclusi"
       }
     }
   ],
@@ -39,9 +39,25 @@
   },
   "arguments": {
     "execute": {
-      "inArguments": [],
+      "inArguments": [
+        {
+          "contactIdentifier": "{{Contact.Key}}"
+        },
+        {
+          "emailAddress": "{{InteractionDefaults.EmailAddress}}"
+        },
+        {
+          "phone": "{{InteractionDefaults.Phone}}"
+        }
+      ],
       "outArguments": [],
-      "url": "https://roccoan-sigro.github.io/customactmap/"
+      "url": "https://roccoan-sigro.github.io/customactmap/",
+      "verb": "POST",
+      "format": "json",
+      "useJwt": false,
+      "timeout": 60,
+      "retryCount": 5,
+      "retryDelay": 100
     }
   }
 }
