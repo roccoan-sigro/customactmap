@@ -1,0 +1,1 @@
+connection.trigger('ready');
