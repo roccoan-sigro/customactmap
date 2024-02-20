@@ -1,5 +1,5 @@
 // Definisci il modulo usando la sintassi di RequireJS
-define(["js/postmonger"], function (Postmonger) {
+define(["js/postmonger", "jquery"], function (Postmonger, $) {
     'use strict';
 
     // Inizializza la sessione di Postmonger
