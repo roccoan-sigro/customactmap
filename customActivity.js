@@ -1,47 +1,87 @@
-define(["postmonger"], function(pm) {
-  // Funzione principale invocata da Journey Builder
-  const journeyStart = function(callback) {
-    // Recupera i dati di configurazione e i dati di input
-    const journeyActivitySettings = pm.settingsFor("currentActivity");
-    const input = pm.inputData.get("inputData");
+define(['postmonger'], function (Postmonger) {
+    'use strict';
 
-    // Estrai coordinate minime e massime dal front-end
-    const selectedMinLatitude = input.selectedMinLatitude;
-    const selectedMaxLatitude = input.selectedMaxLatitude;
-    const selectedMinLongitude = input.selectedMinLongitude;
-    const selectedMaxLongitude = input.selectedMaxLongitude;
+    var connection = new Postmonger.Session();
+    var payload = {};
 
-    // Elabora i dati dell'entry source in batch
-    pm.data.forAllInDataExtension(journeyActivitySettings.sourceDE, input, processRow, callback);
-  };
+    $(window).ready(onRender);
 
-  // Funzione per elaborare ogni riga della data extension
-  const processRow = function(row, callback) {
-    // Estrai coordinate dalla mail address JSON
-    const physicalAddress = row.PhysicalEmailAddress;
-    const addressObj = JSON.parse(physicalAddress);
-    const latitude = addressObj.latitude;
-    const longitude = addressObj.longitude;
+    connection.on('requestedTokens', onRequestedTokens);
+    connection.on('requestedEndpoints', onRequestedEndpoints);
+    connection.on('requestedSchema', onRequestedSchema);
+    connection.on('requestedCulture', onRequestedCulture);
+    connection.on('initActivity', initialize);
+    connection.on('clickedNext', save);
 
-    // Verifica se le coordinate rientrano nell'area selezionata
-    const isWithinArea = isCoordinateWithinBounds(latitude, longitude, selectedMinLatitude, selectedMaxLatitude, selectedMinLongitude, selectedMaxLongitude);
+    function onRender() {
+        // Fetch the data from the page and populate the payload
+        payload.latitudeMin = parseFloat(getQueryParam('minLatitude'));
+        payload.latitudeMax = parseFloat(getQueryParam('maxLatitude'));
+        payload.longitudeMin = parseFloat(getQueryParam('minLongitude'));
+        payload.longitudeMax = parseFloat(getQueryParam('maxLongitude'));
 
-    // Inserisci il contatto nel ramo appropriato del journey
-    if (isWithinArea) {
-      pm.journeyContinue("inArea");
-    } else {
-      pm.journeyContinue("excluded");
+        // Trigger the 'ready' event when rendering is complete
+        connection.trigger('ready');
     }
 
-    // Processo completato per questa riga
-    callback();
-  };
+    function onRequestedTokens(tokens) {
+        // Handling requested tokens
+        // Add logic to handle tokens if needed
+        connection.trigger('requestedTokens', tokens);
+    }
 
-  // Funzione per verificare se le coordinate rientrano nell'area selezionata
-  const isCoordinateWithinBounds = function(latitude, longitude, minLat, maxLat, minLon, maxLon) {
-    return latitude >= minLat && latitude <= maxLat && longitude >= minLon && longitude <= maxLon;
-  };
+    function onRequestedEndpoints(endpoints) {
+        // Handling requested endpoints
+        // Add logic to handle endpoints if needed
+        connection.trigger('requestedEndpoints', endpoints);
+    }
 
-  // Registra la funzione con Postmonger
-  pm.register("journeyStart", journeyStart);
+    function onRequestedSchema(schema) {
+        // Handling requested schema
+        // Add logic to handle schema if needed
+        connection.trigger('requestedSchema', schema);
+    }
+
+    function onRequestedCulture(culture) {
+        // Handling requested culture
+        // Add logic to handle culture if needed
+        connection.trigger('requestedCulture', culture);
+    }
+
+    function initialize(data) {
+        // Handling initialization
+        // Add logic to handle initialization if needed
+        if (data) {
+            payload = data;
+        }
+        connection.trigger('initActivity', payload);
+    }
+
+    function save() {
+        // Handling the 'Next' button click
+
+        // Assuming your DE fields are named 'latitude' and 'longitude'
+        var latitude = parseFloat('{{Contact.Attribute.PhysicalEmailAddress.latitude}}');
+        var longitude = parseFloat('{{Contact.Attribute.PhysicalEmailAddress.longitude}}');
+
+        // Check if the contact's coordinates fall within the selected range
+        if (
+            latitude >= payload.latitudeMin &&
+            latitude <= payload.latitudeMax &&
+            longitude >= payload.longitudeMin &&
+            longitude <= payload.longitudeMax
+        ) {
+            // Contact falls within the selected range, proceed with the first branch of the journey
+            connection.trigger('nextStep');
+        } else {
+            // Contact does not fall within the selected range, proceed with the second branch of the journey
+            connection.trigger('gotoStep', 2); // Assuming second step index is 2
+        }
+    }
+
+    // Utility function to get query parameters from the URL
+    function getQueryParam(param) {
+        var urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
 });
