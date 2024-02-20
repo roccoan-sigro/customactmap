@@ -5,7 +5,7 @@
 		"category": "message"
 	},
   "key": "seleziona-area-sulla-mappa",
-  "type": "MultiCriteriaDecision",
+  "type": "RestDecision",
   "lang": {
     "it-IT": {
       "name": "Seleziona Area sulla Mappa",
@@ -31,10 +31,8 @@
     }
   ],
   "userInterfaces": {
-    "configModal": {
-			"height": 500,
-			"width": 600,
-			"fullscreen": true
+    "configInspector": {
+			"size": "medium"
 		}
   },
   "arguments": {
