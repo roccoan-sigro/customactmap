@@ -1,4 +1,4 @@
-define('customActivity', ['postmonger'], function (Postmonger) {
+define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     'use strict';
 
     var connection = new Postmonger.Session();
