@@ -55,6 +55,7 @@
             }
             marker = L.marker(e.latlng).addTo(map);
             updateCircle(parseInt(radiusSlider.value));
+            saveSelection();
         });
 
         geocoder.on('markgeocode', function(e) {
@@ -65,6 +66,7 @@
             }
             marker = L.marker(center).addTo(map);
             updateCircle(parseInt(radiusSlider.value));
+            saveSelection();
         });
 
         const radiusSlider = document.getElementById('radiusSlider');
@@ -74,12 +76,14 @@
             const radius = parseInt(radiusSlider.value);
             radiusInput.value = radius;
             updateCircle(radius);
+            saveSelection();
         });
 
         radiusInput.addEventListener('input', () => {
             const radius = parseInt(radiusInput.value);
             radiusSlider.value = radius;
             updateCircle(radius);
+            saveSelection();
         });
 
         let selectedMinLatitude;
@@ -111,6 +115,30 @@
                 console.log('Coordinate rientranti nel cerchio:', latLngArray);
             }
         }
+
+        function saveSelection() {
+            if (marker && circle) {
+                const selection = {
+                    lat: marker.getLatLng().lat,
+                    lng: marker.getLatLng().lng,
+                    radius: radiusSlider.value
+                };
+                localStorage.setItem('mapSelection', JSON.stringify(selection));
+            }
+        }
+
+        function loadSelection() {
+            const selection = JSON.parse(localStorage.getItem('mapSelection'));
+            if (selection) {
+                marker = L.marker([selection.lat, selection.lng]).addTo(map);
+                radiusSlider.value = selection.radius;
+                radiusInput.value = selection.radius;
+                updateCircle(parseInt(selection.radius));
+            }
+        }
+
+        // Carica la selezione salvata quando la pagina viene caricata
+        loadSelection();
     </script>
 </body>
 </html>
