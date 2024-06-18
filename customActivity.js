@@ -14,7 +14,8 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
 
     connection.on('initActivity', initialize);
     connection.on('requestedInteraction', setInteraction);
-    connection.on('clickedNext', save);
+    connection.on('requestedTokens', onRequestedTokens);
+    connection.on('clickedDone', onSave);
 
     function onRender() {
         connection.trigger('ready');
@@ -35,9 +36,33 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
 
         var inArguments = hasInArguments ? payload['arguments'].execute.inArguments : {};
 
-        // Initialize your form fields here with inArguments values, if necessary
-        // Carica la selezione salvata
-        loadSelection(inArguments);
+        // Recupera i dati salvati precedentemente e imposta le variabili
+        if (inArguments[0].minLatitude) {
+            selectedMinLatitude = inArguments[0].minLatitude;
+            selectedMaxLatitude = inArguments[0].maxLatitude;
+            selectedMinLongitude = inArguments[0].minLongitude;
+            selectedMaxLongitude = inArguments[0].maxLongitude;
+
+            // Aggiorna la mappa con i dati salvati
+            if (selectedMinLatitude && selectedMaxLatitude && selectedMinLongitude && selectedMaxLongitude) {
+                var bounds = [
+                    [selectedMinLatitude, selectedMinLongitude],
+                    [selectedMaxLatitude, selectedMaxLongitude]
+                ];
+
+                var circleBounds = L.latLngBounds(bounds);
+                var center = circleBounds.getCenter();
+                var radius = calculateRadius(circleBounds);
+
+                map.setView(center, 13);
+                marker = L.marker(center).addTo(map);
+                circle = L.circle(center, {
+                    radius: radius,
+                    color: 'blue',
+                    fillOpacity: 0.2
+                }).addTo(map);
+            }
+        }
     }
 
     function setInteraction(interaction) {
@@ -46,7 +71,12 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         }
     }
 
-    function save() {
+    function onRequestedTokens(tokens) {
+        // Gestisci i token richiesti, se necessario
+    }
+
+    function onSave() {
+        // Salva i dati dalla mappa
         var minLatitude = selectedMinLatitude;
         var maxLatitude = selectedMaxLatitude;
         var minLongitude = selectedMinLongitude;
@@ -61,40 +91,27 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
 
         payload['metaData'].isConfigured = true;
 
+        // Log per il debugging
+        console.log('Payload salvato:', JSON.stringify(payload));
+
         connection.trigger('updateActivity', payload);
     }
 
-    function loadSelection(inArguments) {
-        var selection = inArguments.find(arg => arg.minLatitude && arg.maxLatitude && arg.minLongitude && arg.maxLongitude);
-        if (selection) {
-            selectedMinLatitude = selection.minLatitude;
-            selectedMaxLatitude = selection.maxLatitude;
-            selectedMinLongitude = selection.minLongitude;
-            selectedMaxLongitude = selection.maxLongitude;
+    function calculateRadius(bounds) {
+        var center = bounds.getCenter();
+        var northEast = bounds.getNorthEast();
+        var earthRadius = 6371000; // Raggio della Terra in metri
 
-            // Aggiorna la mappa con la selezione salvata
-            var lat = (parseFloat(selectedMinLatitude) + parseFloat(selectedMaxLatitude)) / 2;
-            var lng = (parseFloat(selectedMinLongitude) + parseFloat(selectedMaxLongitude)) / 2;
-            var radius = calculateRadius(selectedMinLatitude, selectedMaxLatitude, selectedMinLongitude, selectedMaxLongitude);
-
-            marker = L.marker([lat, lng]).addTo(map);
-            radiusSlider.value = radius;
-            radiusInput.value = radius;
-            updateCircle(radius);
-        }
-    }
-
-    function calculateRadius(minLat, maxLat, minLng, maxLng) {
-        var earthRadius = 6371000; // in meters
-        var dLat = toRadians(maxLat - minLat);
-        var dLng = toRadians(maxLng - minLng);
+        var dLat = toRadians(northEast.lat - center.lat);
+        var dLng = toRadians(northEast.lng - center.lng);
 
         var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(toRadians(minLat)) * Math.cos(toRadians(maxLat)) *
+                Math.cos(toRadians(center.lat)) * Math.cos(toRadians(northEast.lat)) *
                 Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-        return earthRadius * c / 2; // raggio approssimativo del cerchio
+        return earthRadius * c / 2; // Raggio approssimativo del cerchio
     }
 
     function toRadians(degrees) {
