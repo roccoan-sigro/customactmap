@@ -2,7 +2,8 @@
   "workflowApiVersion": "1.1",
 	"metaData": {
 		"icon": "images/icon.png",
-		"category": "flow"
+		"category": "flow",
+		"configOnDrop": "true"
 	},
   "key": "seleziona-area-sulla-mappa",
   "type": "RestDecision",
