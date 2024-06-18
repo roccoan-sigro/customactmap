@@ -15,7 +15,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     connection.on('initActivity', initialize);
     connection.on('requestedInteraction', setInteraction);
     connection.on('requestedTokens', onRequestedTokens);
-    connection.on('clickedDone', onSave);
+    connection.on('clickedDone', save); // Aggiorna qui l'evento su cui viene chiamata la funzione save()
 
     function onRender() {
         connection.trigger('ready');
@@ -75,7 +75,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         // Gestisci i token richiesti, se necessario
     }
 
-    function onSave() {
+    function save() {
         // Salva i dati dalla mappa
         var minLatitude = selectedMinLatitude;
         var maxLatitude = selectedMaxLatitude;
