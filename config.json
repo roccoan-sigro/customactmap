@@ -53,7 +53,7 @@
         }
       ],
       "outArguments": [],
-      "url": "https://roccoan-sigro.github.io/customactmap/",
+      "url": "https://cloud.comunicazione.comune.roma.it/mappapc",
       "verb": "POST",
       "format": "json",
       "useJwt": false,
