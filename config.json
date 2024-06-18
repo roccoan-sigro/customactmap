@@ -1,80 +1,80 @@
 {
-  "workflowApiVersion": "1.1",
-  "metaData": {
-    "icon": "images/icon.png",
-    "category": "flow",
-    "configOnDrop": true
-  },
-  "key": "seleziona-area-sulla-mappa",
-  "type": "RestDecision",
-  "lang": {
-    "it-IT": {
-      "name": "Seleziona Area sulla Mappa",
-      "description": "Custom Split activity that makes a decision based on selected map area"
-    }
-  },
-  "outcomes": [
-    {
-      "arguments": {
-        "branchResult": "selectedMapArea"
-      },
-      "metaData": {
-        "label": "Area Selezionata sulla Mappa"
-      }
+    "workflowApiVersion": "1.1",
+    "metaData": {
+        "icon": "images/icon.png",
+        "category": "flow",
+        "configOnDrop": true
     },
-    {
-      "arguments": {
-        "branchResult": "remainingContacts"
-      },
-      "metaData": {
-        "label": "Contatti Esclusi"
-      }
-    }
-  ],
-  "userInterfaces": {
-    "configInspector": {
-      "size": "medium"
-    }
-  },
-  "arguments": {
-    "execute": {
-      "inArguments": [
-        {
-          "subscriberKey": "{{Contact.Attribute.JourneyEntrySource.SubscriberKey}}"
-        },
-        {
-          "emailAddress": "{{Contact.Attribute.JourneyEntrySource.EmailAddress}}"
-        },
-        {
-          "phone": "{{Contact.Attribute.JourneyEntrySource.Phone}}"
-        },
-        {
-          "address": "{{Contact.Attribute.JourneyEntrySource.PhisicalMailingAddress}}"
+    "key": "seleziona-area-sulla-mappa",
+    "type": "RestDecision",
+    "lang": {
+        "it-IT": {
+            "name": "Seleziona Area sulla Mappa",
+            "description": "Custom Split activity that makes a decision based on selected map area"
         }
-      ],
-      "outArguments": [
+    },
+    "outcomes": [
         {
-          "debugInfo": {
-            "type": "object",
-            "required": false
-          },
-          "errorMessage": {
-            "type": "string",
-            "required": false
-          },
-          "errorStack": {
-            "type": "string",
-            "required": false
-          }
+            "arguments": {
+                "branchResult": "selectedMapArea"
+            },
+            "metaData": {
+                "label": "Area Selezionata sulla Mappa"
+            }
+        },
+        {
+            "arguments": {
+                "branchResult": "remainingContacts"
+            },
+            "metaData": {
+                "label": "Contatti Esclusi"
+            }
         }
-      ],
-      "url": "https://cloud.comunicazione.comune.roma.it/mappapc",
-      "verb": "POST",
-      "format": "json",
-      "useJwt": false,
-      "timeout": 60,
-      "retryCount": 5,
-      "retryDelay": 100
+    ],
+    "userInterfaces": {
+        "configInspector": {
+            "size": "medium"
+        }
+    },
+    "arguments": {
+        "execute": {
+            "inArguments": [
+                {
+                    "subscriberKey": "{{Contact.Attribute.JourneyEntrySource.SubscriberKey}}"
+                },
+                {
+                    "emailAddress": "{{Contact.Attribute.JourneyEntrySource.EmailAddress}}"
+                },
+                {
+                    "phone": "{{Contact.Attribute.JourneyEntrySource.Phone}}"
+                },
+                {
+                    "address": "{{Contact.Attribute.JourneyEntrySource.PhisicalMailingAddress}}"
+                }
+            ],
+            "outArguments": [
+                {
+                    "debugInfo": {
+                        "type": "object",
+                        "required": false
+                    },
+                    "errorMessage": {
+                        "type": "string",
+                        "required": false
+                    },
+                    "errorStack": {
+                        "type": "string",
+                        "required": false
+                    }
+                }
+            ],
+            "url": "https://cloud.comunicazione.comune.roma.it/mappapc",
+            "verb": "POST",
+            "format": "json",
+            "useJwt": false,
+            "timeout": 60,
+            "retryCount": 5,
+            "retryDelay": 100
+        }
     }
-  }
 }
