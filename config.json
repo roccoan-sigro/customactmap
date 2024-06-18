@@ -1,10 +1,10 @@
 {
   "workflowApiVersion": "1.1",
-	"metaData": {
-		"icon": "images/icon.png",
-		"category": "flow",
-		"configOnDrop": "true"
-	},
+  "metaData": {
+    "icon": "images/icon.png",
+    "category": "flow",
+    "configOnDrop": true
+  },
   "key": "seleziona-area-sulla-mappa",
   "type": "RestDecision",
   "lang": {
@@ -33,8 +33,8 @@
   ],
   "userInterfaces": {
     "configInspector": {
-			"size": "medium"
-		}
+      "size": "medium"
+    }
   },
   "arguments": {
     "execute": {
@@ -52,7 +52,22 @@
           "address": "{{Contact.Attribute.JourneyEntrySource.PhisicalMailingAddress}}"
         }
       ],
-      "outArguments": [],
+      "outArguments": [
+        {
+          "debugInfo": {
+            "type": "object",
+            "required": false
+          },
+          "errorMessage": {
+            "type": "string",
+            "required": false
+          },
+          "errorStack": {
+            "type": "string",
+            "required": false
+          }
+        }
+      ],
       "url": "https://cloud.comunicazione.comune.roma.it/mappapc",
       "verb": "POST",
       "format": "json",
