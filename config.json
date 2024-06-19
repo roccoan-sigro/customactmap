@@ -49,7 +49,7 @@
                     "phone": "{{Contact.Attribute.JourneyEntrySource.Phone}}"
                 },
                 {
-                    "address": "{{Contact.Attribute.JourneyEntrySource.PhisicalMailingAddress}}"
+                    "address": "{{Contact.Attribute.JourneyEntrySource.PersonMailingAddress}}"
                 }
             ],
             "outArguments": [
