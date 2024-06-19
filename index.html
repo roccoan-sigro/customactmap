@@ -4,110 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seleziona Area sulla Mappa</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.min.css" rel="stylesheet">
-
-<style>
-    #map {
-        height: 400px;
-    }
-</style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.min.css" rel="stylesheet">
+    <style>
+        #map {
+            height: 400px;
+        }
+    </style>
 </head>
 <body>
     <div id="map"></div>
     <input type="range" id="radiusSlider" min="50" max="20000" step="50" value="50">
     <input type="number" id="radiusInput" min="50" max="20000" step="50" value="50"> metri
-<script src="js/require.js"></script>
-<script>
-    require.config({
-        paths: {
-            "jquery": "js/jquery.min",
-            "postmonger": "js/postmonger",
-            "customActivity": "customActivity"
-        }
-    });
+    <script src="js/require.js"></script>
+    <script>
+        require.config({
+            paths: {
+                "jquery": "js/jquery.min",
+                "postmonger": "js/postmonger",
+                "customActivity": "customActivity"
+            }
+        });
 
-    require(['jquery', 'postmonger', 'customActivity'], function ($, Postmonger, customActivity) {
-        // Il tuo codice JavaScript principale può andare qui
-    });
-</script>
+        require(['jquery', 'postmonger', 'customActivity'], function ($, Postmonger, customActivity) {
+            // Il tuo codice JavaScript principale può andare qui
+        });
+    </script>
 
-<script>
-    const map = L.map('map').setView([41.9028, 12.4964], 13); // Centro su Roma
+    <script>
+        const map = L.map('map').setView([41.9028, 12.4964], 13); // Centro su Roma
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-    const geocoder = L.Control.geocoder().addTo(map);
+        const geocoder = L.Control.geocoder().addTo(map);
 
-    let marker;
-    let circle = L.circle(); 
+        let marker;
+        let circle = L.circle(); 
 
-    map.on('click', (e) => {
-        if (marker) {
-            map.removeLayer(marker);
-            map.removeLayer(circle);
-        }
-        marker = L.marker(e.latlng).addTo(map);
-        updateCircle(parseInt(radiusSlider.value));
-    });
-
-    geocoder.on('markgeocode', function(e) {
-        const center = e.geocode.center;
-        if (marker) {
-            map.removeLayer(marker);
-            map.removeLayer(circle);
-        }
-        marker = L.marker(center).addTo(map);
-        updateCircle(parseInt(radiusSlider.value));
-    });
-
-    const radiusSlider = document.getElementById('radiusSlider');
-    const radiusInput = document.getElementById('radiusInput');
-
-    radiusSlider.addEventListener('input', () => {
-        const radius = parseInt(radiusSlider.value);
-        radiusInput.value = radius;
-        updateCircle(radius);
-    });
-
-    radiusInput.addEventListener('input', () => {
-        const radius = parseInt(radiusInput.value);
-        radiusSlider.value = radius;
-        updateCircle(radius);
-    });
-
-    let selectedMinLatitude;
-    let selectedMaxLatitude;
-    let selectedMinLongitude;
-    let selectedMaxLongitude;
-
-    function updateCircle(radius) {
-        if (marker) {
-            if (map.hasLayer(circle)) {
+        map.on('click', (e) => {
+            if (marker) {
+                map.removeLayer(marker);
                 map.removeLayer(circle);
             }
-            circle = L.circle(marker.getLatLng(), {
-                radius: radius,
-                color: 'blue',
-                fillOpacity: 0.2
-            }).addTo(map);
+            marker = L.marker(e.latlng).addTo(map);
+            updateCircle(parseInt(radiusSlider.value));
+        });
 
-            const bounds = circle.getBounds();
-            selectedMinLatitude = bounds.getSouthWest().lat.toFixed(8);
-            selectedMaxLatitude = bounds.getNorthEast().lat.toFixed(8);
-            selectedMinLongitude = bounds.getSouthWest().lng.toFixed(8);
-            selectedMaxLongitude = bounds.getNorthEast().lng.toFixed(8);
+        geocoder.on('markgeocode', function(e) {
+            const center = e.geocode.center;
+            if (marker) {
+                map.removeLayer(marker);
+                map.removeLayer(circle);
+            }
+            marker = L.marker(center).addTo(map);
+            updateCircle(parseInt(radiusSlider.value));
+        });
 
-            const latLngArray = [                [selectedMinLatitude, selectedMinLongitude],
-                [selectedMaxLatitude, selectedMaxLongitude]
-            ];
-            console.log('Coordinate rientranti nel cerchio:', latLngArray);
+        const radiusSlider = document.getElementById('radiusSlider');
+        const radiusInput = document.getElementById('radiusInput');
+
+        radiusSlider.addEventListener('input', () => {
+            const radius = parseInt(radiusSlider.value);
+            radiusInput.value = radius;
+            updateCircle(radius);
+        });
+
+        radiusInput.addEventListener('input', () => {
+            const radius = parseInt(radiusInput.value);
+            radiusSlider.value = radius;
+            updateCircle(radius);
+        });
+
+        let selectedMinLatitude;
+        let selectedMaxLatitude;
+        let selectedMinLongitude;
+        let selectedMaxLongitude;
+
+        function updateCircle(radius) {
+            if (marker) {
+                if (map.hasLayer(circle)) {
+                    map.removeLayer(circle);
+                }
+                circle = L.circle(marker.getLatLng(), {
+                    radius: radius,
+                    color: 'blue',
+                    fillOpacity: 0.2
+                }).addTo(map);
+
+                const bounds = circle.getBounds();
+                selectedMinLatitude = bounds.getSouthWest().lat.toFixed(8);
+                selectedMaxLatitude = bounds.getNorthEast().lat.toFixed(8);
+                selectedMinLongitude = bounds.getSouthWest().lng.toFixed(8);
+                selectedMaxLongitude = bounds.getNorthEast().lng.toFixed(8);
+
+                const latLngArray = [
+                    [selectedMinLatitude, selectedMinLongitude],
+                    [selectedMaxLatitude, selectedMaxLongitude]
+                ];
+                console.log('Coordinate rientranti nel cerchio:', latLngArray);
+            }
         }
-    }
-</script>
+
+        // Inizializzazione del payload
+        window.addEventListener('DOMContentLoaded', (event) => {
+            customActivity.initialize();
+        });
+    </script>
 </body>
 </html>
