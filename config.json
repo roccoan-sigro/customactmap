@@ -39,34 +39,17 @@
     "arguments": {
         "execute": {
             "inArguments": [
-                {
-                    "subscriberKey": "{{Contact.Attribute.Test_Mappe.SubscriberKey}}"
-                },
-                {
-                    "emailAddress": "{{Contact.Attribute.Test_Mappe.EmailAddress}}"
-                },
-                {
-                    "phone": "{{Contact.Attribute.Test_Mappe.Phone}}"
-                },
-                {
-                    "address": "{{Contact.Attribute.Test_Mappe.PersonMailingAddress}}"
-                }
+                { "SubscriberKey": "{{Contact.Attribute.JourneyEntrySource.SubscriberKey}}" },
+                { "EmailAddress": "{{Contact.Attribute.JourneyEntrySource.EmailAddress}}" },
+                { "Phone": "{{Contact.Attribute.JourneyEntrySource.Phone}}" },
+                { "PersonMailingAddress": "{{Contact.Attribute.JourneyEntrySource.PersonMailingAddress}}" },
+                { "minLatitude": "{{Interaction.Template.Configuration.minLatitude}}" },
+                { "maxLatitude": "{{Interaction.Template.Configuration.maxLatitude}}" },
+                { "minLongitude": "{{Interaction.Template.Configuration.minLongitude}}" },
+                { "maxLongitude": "{{Interaction.Template.Configuration.maxLongitude}}" }
             ],
             "outArguments": [
-                {
-                    "debugInfo": {
-                        "type": "object",
-                        "required": false
-                    },
-                    "errorMessage": {
-                        "type": "string",
-                        "required": false
-                    },
-                    "errorStack": {
-                        "type": "string",
-                        "required": false
-                    }
-                }
+                { "branchResult": "{{Event.Response.branchResult}}" }
             ],
             "url": "https://cloud.comunicazione.comune.roma.it/mappapc",
             "verb": "POST",
