@@ -19,7 +19,7 @@
     <input type="range" id="radiusSlider" min="50" max="20000" step="50" value="50">
     <input type="number" id="radiusInput" min="50" max="20000" step="50" value="50"> metri
     <script src="js/require.js"></script>
-        <script>
+    <script>
         require.config({
             paths: {
                 "jquery": "js/jquery.min",
@@ -29,10 +29,9 @@
         });
 
         require(['jquery', 'postmonger', 'customActivity'], function ($, Postmonger, customActivity) {
-            // Il tuo codice JavaScript principale può andare qui
+            // Nessun codice aggiuntivo richiesto qui, solo caricamento dei moduli
         });
     </script>
-
 
     <script>
         const map = L.map('map').setView([41.9028, 12.4964], 13); // Centro su Roma
@@ -107,6 +106,11 @@
                     [selectedMaxLatitude, selectedMaxLongitude]
                 ];
                 console.log('Coordinate rientranti nel cerchio:', latLngArray);
+
+                // Chiamare la funzione save() della custom activity per aggiornare le coordinate
+                if (customActivity && typeof customActivity.save === 'function') {
+                    customActivity.save();
+                }
             }
         }
     </script>
