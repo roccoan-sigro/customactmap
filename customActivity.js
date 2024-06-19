@@ -40,10 +40,12 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     }
 
     function save() {
-        var minLatitude = window.selectedMinLatitude;
-        var maxLatitude = window.selectedMaxLatitude;
-        var minLongitude = window.selectedMinLongitude;
-        var maxLongitude = window.selectedMaxLongitude;
+        var coordinates = window.getSelectedCoordinates();
+
+        var minLatitude = coordinates.minLatitude;
+        var maxLatitude = coordinates.maxLatitude;
+        var minLongitude = coordinates.minLongitude;
+        var maxLongitude = coordinates.maxLongitude;
 
         payload['arguments'].execute.inArguments = [{
             "minLatitude": minLatitude,
