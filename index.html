@@ -19,22 +19,20 @@
     <input type="range" id="radiusSlider" min="50" max="20000" step="50" value="50">
     <input type="number" id="radiusInput" min="50" max="20000" step="50" value="50"> metri
     <script src="js/require.js"></script>
-    <script>
+        <script>
         require.config({
             paths: {
                 "jquery": "js/jquery.min",
                 "postmonger": "js/postmonger",
-                "customActivity": "customActivity.js" // Assicurati che il percorso sia corretto
+                "customActivity": "customActivity"
             }
         });
 
         require(['jquery', 'postmonger', 'customActivity'], function ($, Postmonger, customActivity) {
             // Il tuo codice JavaScript principale può andare qui
-            $(window).ready(function() {
-                customActivity.initialize();
-            });
         });
     </script>
+
 
     <script>
         const map = L.map('map').setView([41.9028, 12.4964], 13); // Centro su Roma
