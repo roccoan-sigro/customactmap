@@ -113,6 +113,16 @@
         window.addEventListener('DOMContentLoaded', (event) => {
             customActivity.initialize();
         });
+
+        // Espone le coordinate alla customActivity
+        window.getSelectedCoordinates = function() {
+            return {
+                minLatitude: selectedMinLatitude,
+                maxLatitude: selectedMaxLatitude,
+                minLongitude: selectedMinLongitude,
+                maxLongitude: selectedMaxLongitude
+            };
+        }
     </script>
 </body>
 </html>
