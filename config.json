@@ -48,10 +48,7 @@
                 { "minLongitude": "{{Interaction.Template.Configuration.minLongitude}}" },
                 { "maxLongitude": "{{Interaction.Template.Configuration.maxLongitude}}" }
             ],
-            "outArguments": [
-                { "branchResult": "selectedMapArea" },
-                { "branchResult": "remainingContacts" }
-            ],
+            "outArguments": [],
             "url": "https://mappa-protezione-civile-7987e051c9db.herokuapp.com/execute",
             "verb": "POST",
             "format": "json",
