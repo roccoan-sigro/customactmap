@@ -40,16 +40,16 @@
         "execute": {
             "inArguments": [
                 {
-                    "subscriberKey": "{{Contact.Attribute.JourneyEntrySource.SubscriberKey}}"
+                    "subscriberKey": "{{Contact.Attribute.Test_Mappe.SubscriberKey}}"
                 },
                 {
-                    "emailAddress": "{{Contact.Attribute.JourneyEntrySource.EmailAddress}}"
+                    "emailAddress": "{{Contact.Attribute.Test_Mappe.EmailAddress}}"
                 },
                 {
-                    "phone": "{{Contact.Attribute.JourneyEntrySource.Phone}}"
+                    "phone": "{{Contact.Attribute.Test_Mappe.Phone}}"
                 },
                 {
-                    "address": "{{Contact.Attribute.JourneyEntrySource.PersonMailingAddress}}"
+                    "address": "{{Contact.Attribute.Test_Mappe.PersonMailingAddress}}"
                 }
             ],
             "outArguments": [
