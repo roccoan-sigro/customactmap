@@ -1,6 +1,7 @@
 define([
+    'jquery',
     'postmonger'
-], function(Postmonger) {
+], function($, Postmonger) {
     'use strict';
 
     var connection = new Postmonger.Session();
