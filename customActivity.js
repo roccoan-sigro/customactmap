@@ -1,20 +1,19 @@
-define([
-    'jquery',
-    'postmonger'
-], function($, Postmonger) {
+define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     'use strict';
 
     var connection = new Postmonger.Session();
     var payload = {};
-    var minLatitude, maxLatitude, minLongitude, maxLongitude;
+    var eventDefinitionKey;
 
     $(window).ready(onRender);
 
     connection.on('initActivity', initialize);
+    connection.on('requestedInteraction', setInteraction);
     connection.on('clickedNext', save);
 
     function onRender() {
-        // Initialize your activity here
+        connection.trigger('ready');
+        connection.trigger('requestInteraction');
     }
 
     function initialize(data) {
@@ -22,7 +21,6 @@ define([
             payload = data;
         }
 
-        // Recupera i dati di configurazione iniziali se disponibili
         var hasInArguments = Boolean(
             payload['arguments'] &&
             payload['arguments'].execute &&
@@ -30,47 +28,38 @@ define([
             payload['arguments'].execute.inArguments.length > 0
         );
 
-        var inArguments = hasInArguments ? payload['arguments'].execute.inArguments : [];
+        var inArguments = hasInArguments ? payload['arguments'].execute.inArguments : {};
 
-        $.each(inArguments, function(index, inArgument) {
-            if (inArgument.minLatitude) {
-                minLatitude = inArgument.minLatitude;
-            }
-            if (inArgument.maxLatitude) {
-                maxLatitude = inArgument.maxLatitude;
-            }
-            if (inArgument.minLongitude) {
-                minLongitude = inArgument.minLongitude;
-            }
-            if (inArgument.maxLongitude) {
-                maxLongitude = inArgument.maxLongitude;
-            }
-        });
-        
-        // Aggiorna la UI con i dati di configurazione
-        $('#minLatitude').val(minLatitude);
-        $('#maxLatitude').val(maxLatitude);
-        $('#minLongitude').val(minLongitude);
-        $('#maxLongitude').val(maxLongitude);
+        // Initialize your form fields here with inArguments values, if necessary
+    }
+
+    function setInteraction(interaction) {
+        if (interaction) {
+            eventDefinitionKey = interaction.eventDefinitionKey;
+        }
     }
 
     function save() {
-        // Recupera i dati dall'input dell'utente
-        minLatitude = $('#minLatitude').val();
-        maxLatitude = $('#maxLatitude').val();
-        minLongitude = $('#minLongitude').val();
-        maxLongitude = $('#maxLongitude').val();
+        var coordinates = window.getSelectedCoordinates();
 
-        // Aggiungi i dati al payload
-        payload['arguments'].execute.inArguments = [
-            { "minLatitude": minLatitude },
-            { "maxLatitude": maxLatitude },
-            { "minLongitude": minLongitude },
-            { "maxLongitude": maxLongitude }
-        ];
+        var minLatitude = coordinates.minLatitude;
+        var maxLatitude = coordinates.maxLatitude;
+        var minLongitude = coordinates.minLongitude;
+        var maxLongitude = coordinates.maxLongitude;
 
-        payload.metaData.isConfigured = true;
+        payload['arguments'].execute.inArguments = [{
+            "minLatitude": minLatitude,
+            "maxLatitude": maxLatitude,
+            "minLongitude": minLongitude,
+            "maxLongitude": maxLongitude
+        }];
+
+        payload['metaData'].isConfigured = true;
 
         connection.trigger('updateActivity', payload);
     }
+
+    return {
+        initialize: initialize
+    };
 });
