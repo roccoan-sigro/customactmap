@@ -1,59 +1,63 @@
 define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     'use strict';
 
-var connection = new Postmonger.Session();
-var payload = {};
-var eventDefinitionKey;
+    var connection = new Postmonger.Session();
+    var payload = {};
+    var eventDefinitionKey;
 
-$(window).ready(onRender);
+    $(window).ready(onRender);
 
-connection.on('initActivity', initialize);
-connection.on('requestedInteraction', setInteraction);
-connection.on('clickedNext', save);
+    connection.on('initActivity', initialize);
+    connection.on('requestedInteraction', setInteraction);
+    connection.on('clickedNext', save);
 
-function onRender() {
-    connection.trigger('ready');
-    connection.trigger('requestInteraction');
-}
-
-function initialize(data) {
-    if (data) {
-        payload = data;
+    function onRender() {
+        connection.trigger('ready');
+        connection.trigger('requestInteraction');
     }
 
-    var hasInArguments = Boolean(
-        payload['arguments'] &&
-        payload['arguments'].execute &&
-        payload['arguments'].execute.inArguments &&
-        payload['arguments'].execute.inArguments.length > 0
-    );
+    function initialize(data) {
+        if (data) {
+            payload = data;
+        }
 
-    var inArguments = hasInArguments ? payload['arguments'].execute.inArguments : {};
+        var hasInArguments = Boolean(
+            payload['arguments'] &&
+            payload['arguments'].execute &&
+            payload['arguments'].execute.inArguments &&
+            payload['arguments'].execute.inArguments.length > 0
+        );
 
-    // Initialize your form fields here with inArguments values, if necessary
-}
+        var inArguments = hasInArguments ? payload['arguments'].execute.inArguments : {};
 
-function setInteraction(interaction) {
-    if (interaction) {
-        eventDefinitionKey = interaction.eventDefinitionKey;
+        // Initialize your form fields here with inArguments values, if necessary
     }
-}
 
-function save() {
-    var minLatitude = selectedMinLatitude;
-    var maxLatitude = selectedMaxLatitude;
-    var minLongitude = selectedMinLongitude;
-    var maxLongitude = selectedMaxLongitude;
+    function setInteraction(interaction) {
+        if (interaction) {
+            eventDefinitionKey = interaction.eventDefinitionKey;
+        }
+    }
 
-    payload['arguments'].execute.inArguments = [{
-        "minLatitude": minLatitude,
-        "maxLatitude": maxLatitude,
-        "minLongitude": minLongitude,
-        "maxLongitude": maxLongitude
-    }];
+    function save() {
+        var minLatitude = window.selectedMinLatitude;
+        var maxLatitude = window.selectedMaxLatitude;
+        var minLongitude = window.selectedMinLongitude;
+        var maxLongitude = window.selectedMaxLongitude;
 
-    payload['metaData'].isConfigured = true;
+        payload['arguments'].execute.inArguments = [{
+            "minLatitude": minLatitude,
+            "maxLatitude": maxLatitude,
+            "minLongitude": minLongitude,
+            "maxLongitude": maxLongitude
+        }];
 
-    connection.trigger('updateActivity', payload);
-}
+        payload['metaData'].isConfigured = true;
+
+        connection.trigger('updateActivity', payload);
+    }
+
+    return {
+        initialize: initialize
+    };
 });
