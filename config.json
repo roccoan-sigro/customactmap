@@ -68,7 +68,7 @@
                     }
                 }
             ],
-            "url": "https://cloud.comunicazione.comune.roma.it/mappapc",
+            "url": "https://mappa-protezione-civile-7987e051c9db.herokuapp.com/execute",
             "verb": "POST",
             "format": "json",
             "useJwt": false,
