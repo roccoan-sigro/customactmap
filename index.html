@@ -38,19 +38,20 @@
             const geocoder = L.Control.geocoder().addTo(map);
 
             let marker;
-            let circle = L.circle();
+            let circle;
 
             function addMarkerAndCircle(latlng, radius) {
                 if (marker) {
-                    map.removeLayer(marker);
-                    map.removeLayer(circle);
+                    marker.setLatLng(latlng);
+                    circle.setLatLng(latlng).setRadius(radius);
+                } else {
+                    marker = L.marker(latlng).addTo(map);
+                    circle = L.circle(latlng, {
+                        radius: radius,
+                        color: 'blue',
+                        fillOpacity: 0.2
+                    }).addTo(map);
                 }
-                marker = L.marker(latlng).addTo(map);
-                circle = L.circle(latlng, {
-                    radius: radius,
-                    color: 'blue',
-                    fillOpacity: 0.2
-                }).addTo(map);
 
                 const bounds = circle.getBounds();
                 const selectedMinLatitude = bounds.getSouthWest().lat.toFixed(8);
