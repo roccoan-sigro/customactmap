@@ -74,11 +74,6 @@
                 updateCircle(radius);
             });
 
-            let selectedMinLatitude;
-            let selectedMaxLatitude;
-            let selectedMinLongitude;
-            let selectedMaxLongitude;
-
             function updateCircle(radius) {
                 if (marker) {
                     if (map.hasLayer(circle)) {
@@ -91,10 +86,10 @@
                     }).addTo(map);
 
                     const bounds = circle.getBounds();
-                    selectedMinLatitude = bounds.getSouthWest().lat.toFixed(8);
-                    selectedMaxLatitude = bounds.getNorthEast().lat.toFixed(8);
-                    selectedMinLongitude = bounds.getSouthWest().lng.toFixed(8);
-                    selectedMaxLongitude = bounds.getNorthEast().lng.toFixed(8);
+                    const selectedMinLatitude = bounds.getSouthWest().lat.toFixed(8);
+                    const selectedMaxLatitude = bounds.getNorthEast().lat.toFixed(8);
+                    const selectedMinLongitude = bounds.getSouthWest().lng.toFixed(8);
+                    const selectedMaxLongitude = bounds.getNorthEast().lng.toFixed(8);
 
                     const latLngArray = [
                         [selectedMinLatitude, selectedMinLongitude],
@@ -102,15 +97,13 @@
                     ];
                     console.log('Coordinate rientranti nel cerchio:', latLngArray);
 
-                    // Chiamare la funzione save() della custom activity per aggiornare le coordinate
-                    if (customActivity && typeof customActivity.save === 'function') {
-                        customActivity.save({
-                            minLatitude: selectedMinLatitude,
-                            maxLatitude: selectedMaxLatitude,
-                            minLongitude: selectedMinLongitude,
-                            maxLongitude: selectedMaxLongitude
-                        });
-                    }
+                    // Aggiornare le coordinate nel customActivity ma non chiamare save direttamente
+                    customActivity.updateCoordinates({
+                        minLatitude: selectedMinLatitude,
+                        maxLatitude: selectedMaxLatitude,
+                        minLongitude: selectedMinLongitude,
+                        maxLongitude: selectedMaxLongitude
+                    });
                 }
             }
         });
