@@ -39,12 +39,12 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         }
     }
 
-    function save() {
+    function save(coordinates) {
         // Use the selected coordinates from index.html
-        var minLatitude = selectedMinLatitude;
-        var maxLatitude = selectedMaxLatitude;
-        var minLongitude = selectedMinLongitude;
-        var maxLongitude = selectedMaxLongitude;
+        var minLatitude = coordinates.minLatitude;
+        var maxLatitude = coordinates.maxLatitude;
+        var minLongitude = coordinates.minLongitude;
+        var maxLongitude = coordinates.maxLongitude;
 
         payload['arguments'].execute.inArguments = [{
             "minLatitude": minLatitude,
@@ -59,6 +59,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     }
 
     return {
-        initialize: initialize
+        initialize: initialize,
+        save: save
     };
 });
