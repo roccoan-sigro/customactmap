@@ -38,25 +38,46 @@
             const geocoder = L.Control.geocoder().addTo(map);
 
             let marker;
-            let circle = L.circle(); 
+            let circle = L.circle();
+
+            function addMarkerAndCircle(latlng, radius) {
+                if (marker) {
+                    map.removeLayer(marker);
+                    map.removeLayer(circle);
+                }
+                marker = L.marker(latlng).addTo(map);
+                circle = L.circle(latlng, {
+                    radius: radius,
+                    color: 'blue',
+                    fillOpacity: 0.2
+                }).addTo(map);
+
+                const bounds = circle.getBounds();
+                const selectedMinLatitude = bounds.getSouthWest().lat.toFixed(8);
+                const selectedMaxLatitude = bounds.getNorthEast().lat.toFixed(8);
+                const selectedMinLongitude = bounds.getSouthWest().lng.toFixed(8);
+                const selectedMaxLongitude = bounds.getNorthEast().lng.toFixed(8);
+
+                const latLngArray = [
+                    [selectedMinLatitude, selectedMinLongitude],
+                    [selectedMaxLatitude, selectedMaxLongitude]
+                ];
+                console.log('Coordinate rientranti nel cerchio:', latLngArray);
+
+                customActivity.updateCoordinates({
+                    minLatitude: selectedMinLatitude,
+                    maxLatitude: selectedMaxLatitude,
+                    minLongitude: selectedMinLongitude,
+                    maxLongitude: selectedMaxLongitude
+                });
+            }
 
             map.on('click', (e) => {
-                if (marker) {
-                    map.removeLayer(marker);
-                    map.removeLayer(circle);
-                }
-                marker = L.marker(e.latlng).addTo(map);
-                updateCircle(parseInt(radiusSlider.value));
+                addMarkerAndCircle(e.latlng, parseInt(radiusSlider.value));
             });
 
-            geocoder.on('markgeocode', function(e) {
-                const center = e.geocode.center;
-                if (marker) {
-                    map.removeLayer(marker);
-                    map.removeLayer(circle);
-                }
-                marker = L.marker(center).addTo(map);
-                updateCircle(parseInt(radiusSlider.value));
+            geocoder.on('markgeocode', function (e) {
+                addMarkerAndCircle(e.geocode.center, parseInt(radiusSlider.value));
             });
 
             const radiusSlider = document.getElementById('radiusSlider');
@@ -65,54 +86,23 @@
             radiusSlider.addEventListener('input', () => {
                 const radius = parseInt(radiusSlider.value);
                 radiusInput.value = radius;
-                updateCircle(radius);
+                if (marker) {
+                    addMarkerAndCircle(marker.getLatLng(), radius);
+                }
             });
 
             radiusInput.addEventListener('input', () => {
                 const radius = parseInt(radiusInput.value);
                 radiusSlider.value = radius;
-                updateCircle(radius);
+                if (marker) {
+                    addMarkerAndCircle(marker.getLatLng(), radius);
+                }
             });
 
-            let selectedMinLatitude;
-            let selectedMaxLatitude;
-            let selectedMinLongitude;
-            let selectedMaxLongitude;
-
-            function updateCircle(radius) {
-                if (marker) {
-                    if (map.hasLayer(circle)) {
-                        map.removeLayer(circle);
-                    }
-                    circle = L.circle(marker.getLatLng(), {
-                        radius: radius,
-                        color: 'blue',
-                        fillOpacity: 0.2
-                    }).addTo(map);
-
-                    const bounds = circle.getBounds();
-                    selectedMinLatitude = bounds.getSouthWest().lat.toFixed(8);
-                    selectedMaxLatitude = bounds.getNorthEast().lat.toFixed(8);
-                    selectedMinLongitude = bounds.getSouthWest().lng.toFixed(8);
-                    selectedMaxLongitude = bounds.getNorthEast().lng.toFixed(8);
-
-                    const latLngArray = [
-                        [selectedMinLatitude, selectedMinLongitude],
-                        [selectedMaxLatitude, selectedMaxLongitude]
-                    ];
-                    console.log('Coordinate rientranti nel cerchio:', latLngArray);
-
-                    // Chiamare la funzione save() della custom activity per aggiornare le coordinate
-                    if (customActivity && typeof customActivity.save === 'function') {
-                        customActivity.save({
-                            minLatitude: selectedMinLatitude,
-                            maxLatitude: selectedMaxLatitude,
-                            minLongitude: selectedMinLongitude,
-                            maxLongitude: selectedMaxLongitude
-                        });
-                    }
-                }
-            }
+            // Ricarica le coordinate salvate, se presenti
+            customActivity.initializeMap(function (latlng, radius) {
+                addMarkerAndCircle(latlng, radius);
+            });
         });
     </script>
 </body>
