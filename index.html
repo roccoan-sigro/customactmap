@@ -41,7 +41,9 @@
             let circle;
 
             function addMarkerAndCircle(latlng, radius) {
-                if (marker) {
+                if (!latlng) return;
+
+                if (marker && circle) {
                     marker.setLatLng(latlng);
                     circle.setLatLng(latlng).setRadius(radius);
                 } else {
