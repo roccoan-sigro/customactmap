@@ -20,38 +20,6 @@
     <input type="number" id="radiusInput" min="50" max="20000" step="50" value="50"> metri
     <script src="js/require.js"></script>
     <script>
-        function addMarkerAndCircle(map, latlng, radius, customActivity) {
-            if (window.marker) {
-                map.removeLayer(window.marker);
-                map.removeLayer(window.circle);
-            }
-            window.marker = L.marker(latlng).addTo(map);
-            window.circle = L.circle(latlng, {
-                radius: radius,
-                color: 'blue',
-                fillOpacity: 0.2
-            }).addTo(map);
-
-            const bounds = window.circle.getBounds();
-            const selectedMinLatitude = bounds.getSouthWest().lat.toFixed(8);
-            const selectedMaxLatitude = bounds.getNorthEast().lat.toFixed(8);
-            const selectedMinLongitude = bounds.getSouthWest().lng.toFixed(8);
-            const selectedMaxLongitude = bounds.getNorthEast().lng.toFixed(8);
-
-            const latLngArray = [
-                [selectedMinLatitude, selectedMinLongitude],
-                [selectedMaxLatitude, selectedMaxLongitude]
-            ];
-            console.log('Coordinate rientranti nel cerchio:', latLngArray);
-
-            customActivity.updateCoordinates({
-                minLatitude: selectedMinLatitude,
-                maxLatitude: selectedMaxLatitude,
-                minLongitude: selectedMinLongitude,
-                maxLongitude: selectedMaxLongitude
-            });
-        }
-
         require.config({
             paths: {
                 "jquery": "js/jquery.min",
@@ -72,12 +40,44 @@
             let marker;
             let circle = L.circle();
 
+            function addMarkerAndCircle(latlng, radius) {
+                if (marker) {
+                    map.removeLayer(marker);
+                    map.removeLayer(circle);
+                }
+                marker = L.marker(latlng).addTo(map);
+                circle = L.circle(latlng, {
+                    radius: radius,
+                    color: 'blue',
+                    fillOpacity: 0.2
+                }).addTo(map);
+
+                const bounds = circle.getBounds();
+                const selectedMinLatitude = bounds.getSouthWest().lat.toFixed(8);
+                const selectedMaxLatitude = bounds.getNorthEast().lat.toFixed(8);
+                const selectedMinLongitude = bounds.getSouthWest().lng.toFixed(8);
+                const selectedMaxLongitude = bounds.getNorthEast().lng.toFixed(8);
+
+                const latLngArray = [
+                    [selectedMinLatitude, selectedMinLongitude],
+                    [selectedMaxLatitude, selectedMaxLongitude]
+                ];
+                console.log('Coordinate rientranti nel cerchio:', latLngArray);
+
+                customActivity.updateCoordinates({
+                    minLatitude: selectedMinLatitude,
+                    maxLatitude: selectedMaxLatitude,
+                    minLongitude: selectedMinLongitude,
+                    maxLongitude: selectedMaxLongitude
+                });
+            }
+
             map.on('click', (e) => {
-                addMarkerAndCircle(map, e.latlng, parseInt(radiusSlider.value), customActivity);
+                addMarkerAndCircle(e.latlng, parseInt(radiusSlider.value));
             });
 
             geocoder.on('markgeocode', function (e) {
-                addMarkerAndCircle(map, e.geocode.center, parseInt(radiusSlider.value), customActivity);
+                addMarkerAndCircle(e.geocode.center, parseInt(radiusSlider.value));
             });
 
             const radiusSlider = document.getElementById('radiusSlider');
@@ -87,7 +87,7 @@
                 const radius = parseInt(radiusSlider.value);
                 radiusInput.value = radius;
                 if (marker) {
-                    addMarkerAndCircle(map, marker.getLatLng(), radius, customActivity);
+                    addMarkerAndCircle(marker.getLatLng(), radius);
                 }
             });
 
@@ -95,13 +95,13 @@
                 const radius = parseInt(radiusInput.value);
                 radiusSlider.value = radius;
                 if (marker) {
-                    addMarkerAndCircle(map, marker.getLatLng(), radius, customActivity);
+                    addMarkerAndCircle(marker.getLatLng(), radius);
                 }
             });
 
             // Ricarica le coordinate salvate, se presenti
             customActivity.initializeMap(function (latlng, radius) {
-                addMarkerAndCircle(map, latlng, radius, customActivity);
+                addMarkerAndCircle(latlng, radius);
             });
         });
     </script>
