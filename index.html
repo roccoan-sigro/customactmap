@@ -41,6 +41,7 @@
             let circle = L.circle();
 
             function addMarkerAndCircle(latlng, radius) {
+                if (!latlng) return;
                 if (marker) {
                     map.removeLayer(marker);
                     map.removeLayer(circle);
