@@ -70,10 +70,12 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
 
         payload['metaData'].isConfigured = true;
 
+        console.log('Salvataggio payload:', payload);
         connection.trigger('updateActivity', payload);
     }
 
     function updateCoordinates(newCoordinates) {
+        console.log('Nuove coordinate aggiornate:', newCoordinates);
         coordinates = newCoordinates;
     }
 
