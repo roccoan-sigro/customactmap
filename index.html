@@ -19,94 +19,96 @@
     <input type="range" id="radiusSlider" min="50" max="20000" step="50" value="50">
     <input type="number" id="radiusInput" min="50" max="20000" step="50" value="50"> metri
     <script src="js/require.js"></script>
-    <script>
-        require.config({
-            paths: {
-                "jquery": "js/jquery.min",
-                "postmonger": "js/postmonger",
-                "customActivity": "customActivity"
+<script src="js/require.js"></script>
+<script>
+    require.config({
+        paths: {
+            "jquery": "js/jquery.min",
+            "postmonger": "js/postmonger",
+            "customActivity": "customActivity"
+        }
+    });
+
+    require(['jquery', 'postmonger', 'customActivity'], function ($, Postmonger, customActivity) {
+        const map = L.map('map').setView([41.9028, 12.4964], 13); // Centro su Roma
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        const geocoder = L.Control.geocoder().addTo(map);
+
+        let marker;
+        let circle;
+
+        function addMarkerAndCircle(latlng, radius) {
+            if (!latlng) return;
+
+            if (marker && circle) {
+                marker.setLatLng(latlng);
+                circle.setLatLng(latlng).setRadius(radius);
+            } else {
+                marker = L.marker(latlng).addTo(map);
+                circle = L.circle(latlng, {
+                    radius: radius,
+                    color: 'blue',
+                    fillOpacity: 0.2
+                }).addTo(map);
+            }
+
+            const bounds = circle.getBounds();
+            const selectedMinLatitude = bounds.getSouthWest().lat.toFixed(8);
+            const selectedMaxLatitude = bounds.getNorthEast().lat.toFixed(8);
+            const selectedMinLongitude = bounds.getSouthWest().lng.toFixed(8);
+            const selectedMaxLongitude = bounds.getNorthEast().lng.toFixed(8);
+
+            const latLngArray = [
+                [selectedMinLatitude, selectedMinLongitude],
+                [selectedMaxLatitude, selectedMaxLongitude]
+            ];
+            console.log('Coordinate rientranti nel cerchio:', latLngArray);
+
+            customActivity.updateCoordinates({
+                minLatitude: selectedMinLatitude,
+                maxLatitude: selectedMaxLatitude,
+                minLongitude: selectedMinLongitude,
+                maxLongitude: selectedMaxLongitude
+            });
+        }
+
+        map.on('click', (e) => {
+            addMarkerAndCircle(e.latlng, parseInt(radiusSlider.value));
+        });
+
+        geocoder.on('markgeocode', function (e) {
+            addMarkerAndCircle(e.geocode.center, parseInt(radiusSlider.value));
+        });
+
+        const radiusSlider = document.getElementById('radiusSlider');
+        const radiusInput = document.getElementById('radiusInput');
+
+        radiusSlider.addEventListener('input', () => {
+            const radius = parseInt(radiusSlider.value);
+            radiusInput.value = radius;
+            if (marker) {
+                addMarkerAndCircle(marker.getLatLng(), radius);
             }
         });
 
-        require(['jquery', 'postmonger', 'customActivity'], function ($, Postmonger, customActivity) {
-            const map = L.map('map').setView([41.9028, 12.4964], 13); // Centro su Roma
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-
-            const geocoder = L.Control.geocoder().addTo(map);
-
-            let marker;
-            let circle;
-
-            function addMarkerAndCircle(latlng, radius) {
-                if (!latlng) return;
-
-                if (marker && circle) {
-                    marker.setLatLng(latlng);
-                    circle.setLatLng(latlng).setRadius(radius);
-                } else {
-                    marker = L.marker(latlng).addTo(map);
-                    circle = L.circle(latlng, {
-                        radius: radius,
-                        color: 'blue',
-                        fillOpacity: 0.2
-                    }).addTo(map);
-                }
-
-                const bounds = circle.getBounds();
-                const selectedMinLatitude = bounds.getSouthWest().lat.toFixed(8);
-                const selectedMaxLatitude = bounds.getNorthEast().lat.toFixed(8);
-                const selectedMinLongitude = bounds.getSouthWest().lng.toFixed(8);
-                const selectedMaxLongitude = bounds.getNorthEast().lng.toFixed(8);
-
-                const latLngArray = [
-                    [selectedMinLatitude, selectedMinLongitude],
-                    [selectedMaxLatitude, selectedMaxLongitude]
-                ];
-                console.log('Coordinate rientranti nel cerchio:', latLngArray);
-
-                customActivity.updateCoordinates({
-                    minLatitude: selectedMinLatitude,
-                    maxLatitude: selectedMaxLatitude,
-                    minLongitude: selectedMinLongitude,
-                    maxLongitude: selectedMaxLongitude
-                });
+        radiusInput.addEventListener('input', () => {
+            const radius = parseInt(radiusInput.value);
+            radiusSlider.value = radius;
+            if (marker) {
+                addMarkerAndCircle(marker.getLatLng(), radius);
             }
-
-            map.on('click', (e) => {
-                addMarkerAndCircle(e.latlng, parseInt(radiusSlider.value));
-            });
-
-            geocoder.on('markgeocode', function (e) {
-                addMarkerAndCircle(e.geocode.center, parseInt(radiusSlider.value));
-            });
-
-            const radiusSlider = document.getElementById('radiusSlider');
-            const radiusInput = document.getElementById('radiusInput');
-
-            radiusSlider.addEventListener('input', () => {
-                const radius = parseInt(radiusSlider.value);
-                radiusInput.value = radius;
-                if (marker) {
-                    addMarkerAndCircle(marker.getLatLng(), radius);
-                }
-            });
-
-            radiusInput.addEventListener('input', () => {
-                const radius = parseInt(radiusInput.value);
-                radiusSlider.value = radius;
-                if (marker) {
-                    addMarkerAndCircle(marker.getLatLng(), radius);
-                }
-            });
-
-            // Ricarica le coordinate salvate, se presenti
-            customActivity.initializeMap(function (latlng, radius) {
-                addMarkerAndCircle(latlng, radius);
-            });
         });
-    </script>
+
+        // Ricarica le coordinate salvate, se presenti
+        customActivity.initializeMap(function (latlng, radius) {
+            addMarkerAndCircle(latlng, radius);
+        });
+    });
+</script>
+
 </body>
 </html>
