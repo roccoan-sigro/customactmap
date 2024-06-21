@@ -42,7 +42,7 @@
                 { "SubscriberKey": "{{Contact.Attribute.JourneyEntrySource.SubscriberKey}}" },
                 { "EmailAddress": "{{Contact.Attribute.JourneyEntrySource.EmailAddress}}" },
                 { "Phone": "{{Contact.Attribute.JourneyEntrySource.Phone}}" },
-                { "PersonMailingAddress": "{{Contact.Attribute.JourneyEntrySource.PersonMailingAddress}}" },
+                { "PersonMailingAddress": "{{Contact.Attribute.Test_Mappe.AttributeName}}" },
                 { "minLatitude": "{{Interaction.Template.Configuration.minLatitude}}" },
                 { "maxLatitude": "{{Interaction.Template.Configuration.maxLatitude}}" },
                 { "minLongitude": "{{Interaction.Template.Configuration.minLongitude}}" },
