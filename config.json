@@ -39,11 +39,10 @@
     "arguments": {
         "execute": {
             "inArguments": [
-                { "SubscriberKey": "{{Contact.Attribute.TestAppIo1.SubscriberKey}}" },
-                { "EmailAddress": "{{Contact.Attribute.TestAppIo1.EmailAddress}}" },
-                { "Phone": "{{Contact.Attribute.TestAppIo1.Phone}}" },
-                { "Latitudine": "{{Contact.Attribute.TestAppIo1.Latitudine}}" },
-                { "Longitudine": "{{Contact.Attribute.TestAppIo1.Longitudine}}" },
+                { "SubscriberKey": "{{Contact.Key}}" },
+                { "EmailAddress": "{{InteractionDefaults.Email}}" },
+                { "Latitudine": "{{Contact.Attribute.LongitudineLatitudine.Latitudine}}" },
+                { "Longitudine": "{{Contact.Attribute.LongitudineLatitudine.Longitudine}}" },
                 { "minLatitude": "{{Interaction.Template.Configuration.minLatitude}}" },
                 { "maxLatitude": "{{Interaction.Template.Configuration.maxLatitude}}" },
                 { "minLongitude": "{{Interaction.Template.Configuration.minLongitude}}" },
