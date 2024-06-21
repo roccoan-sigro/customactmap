@@ -39,11 +39,11 @@
     "arguments": {
         "execute": {
             "inArguments": [
-                { "SubscriberKey": "{{Contact.Attribute.JourneyEntrySource.SubscriberKey}}" },
-                { "EmailAddress": "{{Contact.Attribute.JourneyEntrySource.EmailAddress}}" },
-                { "Phone": "{{Contact.Attribute.JourneyEntrySource.Phone}}" },
-                { "Latitudine": "{{Contact.Attribute.JourneyEntrySource.Latitudine}}" },
-                { "Longitudine": "{{Contact.Attribute.JourneyEntrySource.Longitudine}}" },
+                { "SubscriberKey": "{{Contact.Attribute.TestAppIo1.SubscriberKey}}" },
+                { "EmailAddress": "{{Contact.Attribute.TestAppIo1.EmailAddress}}" },
+                { "Phone": "{{Contact.Attribute.TestAppIo1.Phone}}" },
+                { "Latitudine": "{{Contact.Attribute.TestAppIo1.Latitudine}}" },
+                { "Longitudine": "{{Contact.Attribute.TestAppIo1.Longitudine}}" },
                 { "minLatitude": "{{Interaction.Template.Configuration.minLatitude}}" },
                 { "maxLatitude": "{{Interaction.Template.Configuration.maxLatitude}}" },
                 { "minLongitude": "{{Interaction.Template.Configuration.minLongitude}}" },
