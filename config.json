@@ -39,10 +39,10 @@
     "arguments": {
         "execute": {
             "inArguments": [
-                { "SubscriberKey": "{{Contact.Attribute.JourneyEntrySource.SubscriberKey}}" },
-                { "EmailAddress": "{{Contact.Attribute.JourneyEntrySource.EmailAddress}}" },
-                { "Phone": "{{Contact.Attribute.JourneyEntrySource.Phone}}" },
-                { "PersonMailingAddress": "{{Contact.Attribute.Test_Mappe.AttributeName}}" },
+                { "SubscriberKey": "{{Contact.Attribute.Test_Mappe.SubscriberKey}}" },
+                { "EmailAddress": "{{Contact.Attribute.Test_Mappe.EmailAddress}}" },
+                { "Phone": "{{Contact.Attribute.Test_Mappe.Phone}}" },
+                { "PersonMailingAddress": "{{Contact.Attribute.Test_Mappe.PersonMailingAddress}}" },
                 { "minLatitude": "{{Interaction.Template.Configuration.minLatitude}}" },
                 { "maxLatitude": "{{Interaction.Template.Configuration.maxLatitude}}" },
                 { "minLongitude": "{{Interaction.Template.Configuration.minLongitude}}" },
