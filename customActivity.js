@@ -58,8 +58,8 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         var maxLatitude = coordinates.maxLatitude;
         var minLongitude = coordinates.minLongitude;
         var maxLongitude = coordinates.maxLongitude;
-        var userLatitude = coordinates.Latitudine || "{{Event.Latitudine}}";
-        var userLongitude = coordinates.Longitudine || "{{Event.Longitudine}}";
+        var userLatitude = coordinates.Latitudine || "{{Contact.Attribute.LongitudineLatitudine.Latitudine}}";
+        var userLongitude = coordinates.Longitudine || "{{Contact.Attribute.LongitudineLatitudine.Longitudine}}";
     
         payload['arguments'].execute.inArguments = [{
             "minLatitude": minLatitude,
