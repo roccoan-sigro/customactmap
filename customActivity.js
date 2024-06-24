@@ -3,18 +3,20 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
 
     var connection = new Postmonger.Session();
     var payload = {};
-    var eventDefinitionKey;
+    var eventDefinitionKey = null;
     var coordinates = {};
 
     $(window).ready(onRender);
 
     connection.on('initActivity', initialize);
-    connection.on('requestedInteraction', setInteraction);
+    connection.on('requestedTriggerEventDefinition', function (eventDefinitionModel) {
+        eventDefinitionKey = eventDefinitionModel.eventDefinitionKey;
+    });
     connection.on('clickedNext', save);
 
     function onRender() {
         connection.trigger('ready');
-        connection.trigger('requestInteraction');
+        connection.trigger('requestTriggerEventDefinition');
     }
 
     function initialize(data) {
@@ -36,8 +38,8 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
                 maxLatitude: inArguments.maxLatitude,
                 minLongitude: inArguments.minLongitude,
                 maxLongitude: inArguments.maxLongitude,
-                userLatitude: inArguments.Latitudine,
-                userLongitude: inArguments.Longitudine
+                Latitudine: inArguments.Latitudine,
+                Longitudine: inArguments.Longitudine
             };
 
             // Calcolare il centro e il raggio della selezione per ripristinare la mappa
@@ -51,39 +53,33 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         }
     }
 
-    function setInteraction(interaction) {
-        if (interaction) {
-            eventDefinitionKey = interaction.eventDefinitionKey;
-        }
-    }
-
     function save() {
         var minLatitude = coordinates.minLatitude;
         var maxLatitude = coordinates.maxLatitude;
         var minLongitude = coordinates.minLongitude;
         var maxLongitude = coordinates.maxLongitude;
-        var userLatitude = coordinates.userLatitude;
-        var userLongitude = coordinates.userLongitude;
+        var userLatitude = coordinates.Latitudine;
+        var userLongitude = coordinates.Longitudine;
 
         payload['arguments'].execute.inArguments = [{
             "minLatitude": minLatitude,
             "maxLatitude": maxLatitude,
             "minLongitude": minLongitude,
             "maxLongitude": maxLongitude,
-            "userLatitude": "{{Contact.Attribute.LongitudineLatitudine.Latitudine}}",
-            "userLongitude": "{{Contact.Attribute.LongitudineLatitudine.Longitudine}}",
+            "Latitudine": userLatitude,
+            "Longitudine": userLongitude,
             "SubscriberKey": "{{Contact.Key}}",
             "EmailAddress": "{{InteractionDefaults.Email}}"
         }];
 
         payload['metaData'].isConfigured = true;
 
-        console.log('Salvataggio payload:', payload);
+        console.log('Saving payload:', JSON.stringify(payload, null, 2));
         connection.trigger('updateActivity', payload);
     }
 
     function updateCoordinates(newCoordinates) {
-        console.log('Nuove coordinate aggiornate:', newCoordinates);
+        console.log('New coordinates updated:', newCoordinates);
         coordinates = newCoordinates;
     }
 
