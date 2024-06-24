@@ -41,6 +41,8 @@
             "inArguments": [
                 { "SubscriberKey": "{{Contact.Key}}" },
                 { "EmailAddress": "{{InteractionDefaults.Email}}" },
+                { "Latitudine": "{{Contact.Attribute.LongitudineLatitudine.Latitudine}}" },
+                { "Longitudine": "{{Contact.Attribute.LongitudineLatitudine.Longitudine}}" },
                 { "minLatitude": "{{Interaction.Template.Configuration.minLatitude}}" },
                 { "maxLatitude": "{{Interaction.Template.Configuration.maxLatitude}}" },
                 { "minLongitude": "{{Interaction.Template.Configuration.minLongitude}}" },
