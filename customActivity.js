@@ -53,14 +53,14 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         }
     }
 
-    function save() {
+        function save() {
         var minLatitude = coordinates.minLatitude;
         var maxLatitude = coordinates.maxLatitude;
         var minLongitude = coordinates.minLongitude;
         var maxLongitude = coordinates.maxLongitude;
-        var userLatitude = coordinates.Latitudine;
-        var userLongitude = coordinates.Longitudine;
-
+        var userLatitude = coordinates.Latitudine || "{{Event.Latitudine}}";
+        var userLongitude = coordinates.Longitudine || "{{Event.Longitudine}}";
+    
         payload['arguments'].execute.inArguments = [{
             "minLatitude": minLatitude,
             "maxLatitude": maxLatitude,
@@ -71,12 +71,13 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             "SubscriberKey": "{{Contact.Key}}",
             "EmailAddress": "{{InteractionDefaults.Email}}"
         }];
-
+    
         payload['metaData'].isConfigured = true;
-
+    
         console.log('Saving payload:', JSON.stringify(payload, null, 2));
         connection.trigger('updateActivity', payload);
     }
+
 
     function updateCoordinates(newCoordinates) {
         console.log('New coordinates updated:', newCoordinates);
