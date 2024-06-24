@@ -39,16 +39,12 @@
     "arguments": {
         "execute": {
             "inArguments": [
-                {
-                  "minLatitude": "{{Context.minLatitude}}",
-                  "maxLatitude": "{{Context.maxLatitude}}",
-                  "minLongitude": "{{Context.minLongitude}}",
-                  "maxLongitude": "{{Context.maxLongitude}}",
-                  "Latitudine": "{{Event.Latitudine}}",
-                  "Longitudine": "{{Event.Longitudine}}",
-                  "SubscriberKey": "{{Contact.Key}}",
-                  "EmailAddress": "{{InteractionDefaults.Email}}"
-                }
+                { "SubscriberKey": "{{Contact.Key}}" },
+                { "EmailAddress": "{{InteractionDefaults.Email}}" },
+                { "minLatitude": "{{Interaction.Template.Configuration.minLatitude}}" },
+                { "maxLatitude": "{{Interaction.Template.Configuration.maxLatitude}}" },
+                { "minLongitude": "{{Interaction.Template.Configuration.minLongitude}}" },
+                { "maxLongitude": "{{Interaction.Template.Configuration.maxLongitude}}" }
             ],
             "outArguments": [],
             "url": "https://mappa-protezione-civile-7987e051c9db.herokuapp.com/execute",
