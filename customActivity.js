@@ -35,7 +35,9 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
                 minLatitude: inArguments.minLatitude,
                 maxLatitude: inArguments.maxLatitude,
                 minLongitude: inArguments.minLongitude,
-                maxLongitude: inArguments.maxLongitude
+                maxLongitude: inArguments.maxLongitude,
+                userLatitude: inArguments.Latitudine,
+                userLongitude: inArguments.Longitudine
             };
 
             // Calcolare il centro e il raggio della selezione per ripristinare la mappa
@@ -60,12 +62,18 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         var maxLatitude = coordinates.maxLatitude;
         var minLongitude = coordinates.minLongitude;
         var maxLongitude = coordinates.maxLongitude;
+        var userLatitude = coordinates.userLatitude;
+        var userLongitude = coordinates.userLongitude;
 
         payload['arguments'].execute.inArguments = [{
             "minLatitude": minLatitude,
             "maxLatitude": maxLatitude,
             "minLongitude": minLongitude,
-            "maxLongitude": maxLongitude
+            "maxLongitude": maxLongitude,
+            "userLatitude": userLatitude,
+            "userLongitude": userLongitude,
+            "SubscriberKey": "{{Contact.Key}}",
+            "EmailAddress": "{{InteractionDefaults.Email}}"
         }];
 
         payload['metaData'].isConfigured = true;
