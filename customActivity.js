@@ -70,8 +70,8 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             "maxLatitude": maxLatitude,
             "minLongitude": minLongitude,
             "maxLongitude": maxLongitude,
-            "userLatitude": userLatitude,
-            "userLongitude": userLongitude,
+            "userLatitude": "{{Contact.Attribute.LongitudineLatitudine.Latitudine}}",
+            "userLongitude": "{{Contact.Attribute.LongitudineLatitudine.Longitudine}}",
             "SubscriberKey": "{{Contact.Key}}",
             "EmailAddress": "{{InteractionDefaults.Email}}"
         }];
