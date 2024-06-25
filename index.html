@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -167,6 +167,15 @@
             radiusSlider.value = radius;
             if (marker) {
                 addMarkerAndCircle(marker.getLatLng(), radius);
+            }
+        });
+
+        // Aggiorna il marker e il cerchio quando lo zoom cambia
+        map.on('zoomend', () => {
+            if (marker && circle) {
+                const latlng = marker.getLatLng();
+                const radius = parseInt(radiusSlider.value);
+                addMarkerAndCircle(latlng, radius);
             }
         });
 
