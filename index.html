@@ -67,7 +67,7 @@
         /* slider thumb */
         input[type="range"]::-moz-range-thumb {
            border: none; /*Removes extra border that FF applies*/
-           border-radius: 0; /*Removes default border-radius that FF applies*/
+           border-radius: 0; /*Removes default border-radius che FF applies*/
         
            /*custom styles*/
            background-color: #8e001c;
@@ -103,7 +103,9 @@
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        const geocoder = L.Control.geocoder().addTo(map);
+        const geocoder = L.Control.geocoder({
+            defaultMarkGeocode: false
+        }).addTo(map);
 
         let marker;
         let circle;
@@ -148,6 +150,7 @@
         });
 
         geocoder.on('markgeocode', function (e) {
+            map.fitBounds(e.geocode.bbox);
             addMarkerAndCircle(e.geocode.center, parseInt(radiusSlider.value));
         });
 
