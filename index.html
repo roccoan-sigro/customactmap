@@ -113,17 +113,23 @@
         function addMarkerAndCircle(latlng, radius) {
             if (!latlng) return;
 
-            if (marker && circle) {
-                marker.setLatLng(latlng);
-                circle.setLatLng(latlng).setRadius(radius);
-            } else {
-                marker = L.marker(latlng).addTo(map);
-                circle = L.circle(latlng, {
-                    radius: radius,
-                    color: '#8e001c',
-                    fillOpacity: 0.2
-                }).addTo(map);
+            // Rimuove marcatore e cerchio esistenti
+            if (marker) {
+                map.removeLayer(marker);
+                marker = null;
             }
+            if (circle) {
+                map.removeLayer(circle);
+                circle = null;
+            }
+
+            // Aggiunge nuovo marcatore e cerchio
+            marker = L.marker(latlng).addTo(map);
+            circle = L.circle(latlng, {
+                radius: radius,
+                color: '#8e001c',
+                fillOpacity: 0.2
+            }).addTo(map);
 
             const bounds = circle.getBounds();
             const selectedMinLatitude = bounds.getSouthWest().lat.toFixed(8);
