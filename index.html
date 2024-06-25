@@ -24,6 +24,28 @@
             margin-bottom: 5%;
         }
 
+        #map {
+            position: relative;
+            height: 400px; /* Altezza della mappa */
+            border: 4px solid #8e001c;
+            margin-bottom: 5%;
+        }
+        
+        #mapImage {
+            position: absolute;
+            bottom: 10px; /* Distanza dal bordo inferiore */
+            left: 10px; /* Distanza dal bordo sinistro */
+            max-width: 10%; /* Larghezza massima rispetto alla larghezza della mappa */
+            z-index: 1000; /* Assicura che l'immagine sia sopra la mappa */
+        }
+        
+        #mapImage img {
+            width: 100%; /* Assicura che l'immagine riempia il contenitore */
+            height: auto; /* Mantiene l'aspetto proporzionale */
+            border-radius: 5px; /* Stile opzionale per i bordi arrotondati */
+        }
+
+
         /********** Range Input Styles **********/
         /*Range Reset*/
         input[type="range"] {
@@ -99,7 +121,11 @@
     </style>
 </head>
 <body>
-    <div id="map"></div>
+    <div id="map">
+        <div id="mapImage">
+        <img src="https://www.comune.roma.it/web-resources/static/img/logo_roma_header_white.png" alt="Logo Roma">
+    </div>
+    </div>
     <input type="range" id="radiusSlider" min="50" max="20000" step="50" value="50" >
     <input type="number" id="radiusInput" min="50" max="20000" step="50" value="50"> metri
     <div id="address"><span style="font-weight: bold;">Indirizzo:</span> </div>
