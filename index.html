@@ -95,7 +95,7 @@
 <body>
     <div id="map"></div>
     <input type="range" id="radiusSlider" min="50" max="20000" step="50" value="50" >
-    <input type="number" id="radiusInput" min="50" max="20000" step="50" value="50" style="font-family: verdana;"> metri
+    <input type="number" id="radiusInput" min="50" max="20000" step="50" value="50" style="font-family: verdana;"> <span style="font-weight: bold;">metri</span>
     <script src="js/require.js"></script>
 <script src="js/require.js"></script>
 <script>
@@ -192,14 +192,18 @@
         map.on('zoomend', () => {
             if (marker && circle) {
                 const latlng = marker.getLatLng();
-                const radius = parseInt(radiusSlider.value);
-                addMarkerAndCircle(latlng, radius);
+                if (latlng) {
+                    const radius = parseInt(radiusSlider.value);
+                    addMarkerAndCircle(latlng, radius);
+                }
             }
         });
 
         // Ricarica le coordinate salvate, se presenti
         customActivity.initializeMap(function (latlng, radius) {
-            addMarkerAndCircle(latlng, radius);
+            if (latlng) {
+                addMarkerAndCircle(latlng, radius);
+            }
         });
     });
 </script>
