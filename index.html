@@ -132,7 +132,23 @@
             fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latlng.lat}&lon=${latlng.lng}&format=jsonv2`)
                 .then(response => response.json())
                 .then(data => {
-                    const address = `${data.address.road}, ${data.address.house_number}`;
+                    const road = data.address.road || '';
+                    const houseNumber = data.address.house_number || '';
+                    const city = data.address.city || '';
+        
+                    let address = '';
+                    if (road && houseNumber) {
+                        address += `${road}, ${houseNumber}`;
+                    } else if (road) {
+                        address += `${road}`;
+                    } else if (houseNumber) {
+                        address += `${houseNumber}`;
+                    }
+        
+                    if (city) {
+                        address += `, ${city}`;
+                    }
+        
                     document.getElementById('address').innerText = `Indirizzo: ${address}`;
                 })
                 .catch(error => {
@@ -140,6 +156,7 @@
                     document.getElementById('address').innerText = 'Indirizzo non disponibile';
                 });
         }
+
 
 
         function addMarkerAndCircle(latlng, radius) {
