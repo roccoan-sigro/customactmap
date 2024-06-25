@@ -90,12 +90,19 @@
           outline-offset: 0.125rem; 
         }
 
+        #address {
+            font-family: "Montserrat", sans-serif;
+            font-size: 1rem;
+            margin-top: 1rem;
+        }
+
     </style>
 </head>
 <body>
     <div id="map"></div>
     <input type="range" id="radiusSlider" min="50" max="20000" step="50" value="50" >
     <input type="number" id="radiusInput" min="50" max="20000" step="50" value="50" style="font-family: verdana;"> <span style="font-weight: bold;">metri</span>
+    <div id="address">Indirizzo: </div>
     <script src="js/require.js"></script>
 <script src="js/require.js"></script>
 <script>
@@ -118,6 +125,27 @@
 
         let marker;
         let circle;
+
+        function updateAddress(latlng) {
+            if (!latlng) return;
+            const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latlng.lat}&lon=${latlng.lng}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const addressDiv = document.getElementById('address');
+                    if (data && data.display_name) {
+                        addressDiv.textContent = `Indirizzo: ${data.display_name}`;
+                    } else {
+                        addressDiv.textContent = 'Indirizzo: Non disponibile';
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore nel recuperare l\'indirizzo:', error);
+                    const addressDiv = document.getElementById('address');
+                    addressDiv.textContent = 'Indirizzo: Errore nel recuperare l\'indirizzo';
+                });
+        }
 
         function addMarkerAndCircle(latlng, radius) {
             if (!latlng) return;
@@ -158,6 +186,9 @@
                 minLongitude: selectedMinLongitude,
                 maxLongitude: selectedMaxLongitude
             });
+
+            // Aggiorna l'indirizzo
+            updateAddress(latlng);
         }
 
         map.on('click', (e) => {
