@@ -128,24 +128,19 @@
 
         function updateAddress(latlng) {
             if (!latlng) return;
-            const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latlng.lat}&lon=${latlng.lng}`;
-
-            fetch(url)
+        
+            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latlng.lat}&lon=${latlng.lng}&format=jsonv2`)
                 .then(response => response.json())
                 .then(data => {
-                    const addressDiv = document.getElementById('address');
-                    if (data && data.display_name) {
-                        addressDiv.textContent = `Indirizzo: ${data.display_name}`;
-                    } else {
-                        addressDiv.textContent = 'Indirizzo: Non disponibile';
-                    }
+                    const address = `${data.address.road}, ${data.address.house_number}`;
+                    document.getElementById('address').innerText = `Indirizzo: ${address}`;
                 })
                 .catch(error => {
-                    console.error('Errore nel recuperare l\'indirizzo:', error);
-                    const addressDiv = document.getElementById('address');
-                    addressDiv.textContent = 'Indirizzo: Errore nel recuperare l\'indirizzo';
+                    console.error('Errore durante il recupero dell\'indirizzo:', error);
+                    document.getElementById('address').innerText = 'Indirizzo non disponibile';
                 });
         }
+
 
         function addMarkerAndCircle(latlng, radius) {
             if (!latlng) return;
