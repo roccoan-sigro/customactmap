@@ -73,6 +73,12 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         }];
     
         payload['metaData'].isConfigured = true;
+
+        // Aggiorna il nome del primo outcome con i dettagli dell'indirizzo
+        var address = document.getElementById('address').innerText.replace('Indirizzo: ', '');
+        var outcomeLabel = `${address}, ${radius}m`;
+
+        payload['outcomes'][0].metaData.label = outcomeLabel;
     
         console.log('Saving payload:', JSON.stringify(payload, null, 2));
         connection.trigger('updateActivity', payload);
