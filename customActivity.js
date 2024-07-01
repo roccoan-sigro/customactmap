@@ -47,11 +47,11 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             var centerLng = (parseFloat(coordinates.minLongitude) + parseFloat(coordinates.maxLongitude)) / 2;
 
             // Inizializzare la mappa con la selezione salvata
-            initializeMap(function (addMarkerAndCircle) {
+            /*initializeMap(function (addMarkerAndCircle) {
                 addMarkerAndCircle([centerLat, centerLng], 50); // Imposta il raggio iniziale a 50 metri
             });
         }
-    }
+    }*/
 
         function save() {
             var minLatitude = coordinates.minLatitude;
@@ -89,10 +89,10 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
 
 
 
-    function updateCoordinates(newCoordinates) {
+    /*function updateCoordinates(newCoordinates) {
         console.log('New coordinates updated:', newCoordinates);
         coordinates = newCoordinates;
-    }
+    }*/
 
     function initializeMap(callback) {
         if (typeof callback === 'function') {
