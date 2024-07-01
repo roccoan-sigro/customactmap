@@ -77,7 +77,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             // Aggiorna il nome del primo outcome con i dettagli dell'indirizzo
             var address = document.getElementById('address').innerText.replace('Indirizzo: ', '');
             var radius = document.getElementById('radiusInput').value;
-            var outcomeLabel = `${address}, ${radius}m`;
+            var outcomeLabel = ${address}, ${radius}m;
         
             // Aggiorna il nome del primo outcome nel config.json
             payload['outcomes'][0].metaData.label = outcomeLabel;
@@ -86,6 +86,23 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             connection.trigger('updateActivity', payload);
         }
 
+
+
+
+    function updateCoordinates(newCoordinates) {
+        console.log('New coordinates updated:', newCoordinates);
+        coordinates = newCoordinates;
+    }
+
+    function initializeMap(callback) {
+        if (typeof callback === 'function') {
+            callback(function (latlng, radius) {
+                if (window.addMarkerAndCircle) {
+                    window.addMarkerAndCircle(latlng, radius);
+                }
+            });
+        }
+    }
 
     return {
         initialize: initialize,
