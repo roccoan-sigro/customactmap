@@ -47,7 +47,7 @@
                 { "minLatitude": "{{Interaction.Template.Configuration.minLatitude}}" },
                 { "maxLatitude": "{{Interaction.Template.Configuration.maxLatitude}}" },
                 { "minLongitude": "{{Interaction.Template.Configuration.minLongitude}}" },
-                { "maxLongitude": "{{Interaction.Template.Configuration.maxLongitude}}" }
+                { "maxLongitude": "{{Interaction.Template.Configuration.maxLongitude}}" },
                 { "consentFilter": "{{Interaction.Template.Configuration.consentFilter}}" }
             ],
             "outArguments": [],
