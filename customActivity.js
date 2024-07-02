@@ -49,13 +49,13 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             consentFilter = inArguments.consentFilter !== undefined ? inArguments.consentFilter : true;
             $('#consentCheckbox').prop('checked', consentFilter);
 
-            initializeMap(function (addMarkerAndCircle) {
+            if (coordinates.Latitudine && coordinates.Longitudine) {
+                // Aggiungi il marcatore e il cerchio utilizzando i dati salvati
                 addMarkerAndCircle({
-                    Latitudine: coordinates.Latitudine,
-                    Longitudine: coordinates.Longitudine,
-                    radius: selectedRadius
-                });
-            });
+                    lat: coordinates.Latitudine,
+                    lng: coordinates.Longitudine
+                }, selectedRadius);
+            }
         }
 
         $('#consentCheckbox').on('change', function() {
@@ -104,10 +104,8 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         selectedRadius = radius;
     }
 
-    function initializeMap(callback) {
-        if (typeof callback === 'function') {
-            callback(coordinates);
-        }
+    function initializeMap() {
+        // Questa funzione non fa nulla ora
     }
 
     return {
