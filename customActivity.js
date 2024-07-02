@@ -67,7 +67,8 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         var maxLongitude = coordinates.maxLongitude;
         var userLatitude = coordinates.Latitudine || "{{Contact.Attribute.LongitudineLatitudine.Latitudine}}";
         var userLongitude = coordinates.Longitudine || "{{Contact.Attribute.LongitudineLatitudine.Longitudine}}";
-
+        var consentCheckboxSelected = $('#consentCheckbox').is(':checked');
+    
         payload['arguments'].execute.inArguments = [{
             "minLatitude": minLatitude,
             "maxLatitude": maxLatitude,
@@ -77,14 +78,15 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             "Longitudine": userLongitude,
             "SubscriberKey": "{{Contact.Key}}",
             "EmailAddress": "{{InteractionDefaults.Email}}",
-            "consentStatus": consentStatus
+            "consentStatus": consentStatus,
+            "consentCheckboxSelected": consentCheckboxSelected
         }];
-
+    
         payload['metaData'].isConfigured = true;
-
+    
         // Aggiorna l'etichetta del primo ramo
         payload['outcomes'][0].metaData.label = `${selectedAddress}, ${selectedRadius}m`;
-
+    
         console.log('Saving payload:', JSON.stringify(payload, null, 2));
         connection.trigger('updateActivity', payload);
     }
