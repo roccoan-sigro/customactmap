@@ -7,6 +7,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     var coordinates = {};
     var selectedAddress = '';
     var selectedRadius = 0;
+    var consentStatus = true;  // Stato di default della checkbox
 
     $(window).ready(onRender);
 
@@ -50,6 +51,12 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             initializeMap(function (addMarkerAndCircle) {
                 addMarkerAndCircle([centerLat, centerLng], 50);
             });
+
+            // Imposta lo stato della checkbox se già presente nei dati
+            if (typeof inArguments.consentStatus !== 'undefined') {
+                consentStatus = inArguments.consentStatus;
+                $('#consentCheckbox').prop('checked', consentStatus);
+            }
         }
     }
 
@@ -69,7 +76,8 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             "Latitudine": userLatitude,
             "Longitudine": userLongitude,
             "SubscriberKey": "{{Contact.Key}}",
-            "EmailAddress": "{{InteractionDefaults.Email}}"
+            "EmailAddress": "{{InteractionDefaults.Email}}",
+            "consentStatus": consentStatus
         }];
 
         payload['metaData'].isConfigured = true;
@@ -91,6 +99,11 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         selectedRadius = radius;
     }
 
+    function updateConsentStatus(status) {
+        consentStatus = status;
+        console.log('Consent status updated:', consentStatus);
+    }
+
     function initializeMap(callback) {
         if (typeof callback === 'function') {
             callback(function (latlng, radius) {
@@ -106,6 +119,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         save: save,
         updateCoordinates: updateCoordinates,
         updateAddressAndRadius: updateAddressAndRadius,
+        updateConsentStatus: updateConsentStatus,
         initializeMap: initializeMap
     };
 });
