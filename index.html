@@ -66,12 +66,14 @@
                     }
         
                     document.getElementById('address').innerText = `Indirizzo: ${address}`;
+                    customActivity.updateAddressAndRadius(address, radiusSlider.value);
                 })
                 .catch(error => {
                     console.error('Errore durante il recupero dell\'indirizzo:', error);
                     document.getElementById('address').innerText = 'Indirizzo non disponibile';
                 });
         }
+
 
 
 
