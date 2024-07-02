@@ -7,6 +7,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     var coordinates = {};
     var selectedAddress = '';
     var selectedRadius = 0;
+    var consentFilter = true; // Aggiunto questa variabile
 
     $(window).ready(onRender);
 
@@ -47,12 +48,12 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             var centerLat = (parseFloat(coordinates.minLatitude) + parseFloat(coordinates.maxLatitude)) / 2;
             var centerLng = (parseFloat(coordinates.minLongitude) + parseFloat(coordinates.maxLongitude)) / 2;
 
+            consentFilter = inArguments.consentFilter !== undefined ? inArguments.consentFilter : true;
+            $('#consentCheckbox').prop('checked', consentFilter);
+
             initializeMap(function (addMarkerAndCircle) {
                 addMarkerAndCircle([centerLat, centerLng], 50);
             });
-        }
-            consentFilter = inArguments.consentFilter !== undefined ? inArguments.consentFilter : true;
-            $('#consentCheckbox').prop('checked', consentFilter);
         }
 
         // Aggiungi event listener per la checkbox
