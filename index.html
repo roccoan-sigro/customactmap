@@ -26,6 +26,14 @@
     </div>
     <script src="js/require.js"></script>
     <script>
+        require.config({
+        paths: {
+            "jquery": "js/jquery.min",
+            "postmonger": "js/postmonger",
+            "customActivity": "customActivity"
+        }
+    });
+        
     require(['jquery', 'postmonger', 'customActivity'], function ($, Postmonger, customActivity) {
         const map = L.map('map', { attributionControl: false }).setView([41.9028, 12.4964], 13);
 
