@@ -48,6 +48,7 @@
                 { "maxLatitude": "{{Interaction.Template.Configuration.maxLatitude}}" },
                 { "minLongitude": "{{Interaction.Template.Configuration.minLongitude}}" },
                 { "maxLongitude": "{{Interaction.Template.Configuration.maxLongitude}}" }
+                { "consentFilter": "{{Interaction.Template.Configuration.consentFilter}}" }
             ],
             "outArguments": [],
             "url": "https://mappa-protezione-civile-7987e051c9db.herokuapp.com/execute",
