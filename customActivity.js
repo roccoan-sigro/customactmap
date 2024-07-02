@@ -7,7 +7,6 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     var coordinates = {};
     var selectedAddress = '';
     var selectedRadius = 0;
-    var consentStatus = true;  // Stato di default della checkbox
 
     $(window).ready(onRender);
 
@@ -51,13 +50,15 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             initializeMap(function (addMarkerAndCircle) {
                 addMarkerAndCircle([centerLat, centerLng], 50);
             });
-
-            // Imposta lo stato della checkbox se già presente nei dati
-            if (typeof inArguments.consentStatus !== 'undefined') {
-                consentStatus = inArguments.consentStatus;
-                $('#consentCheckbox').prop('checked', consentStatus);
-            }
         }
+            consentFilter = inArguments.consentFilter !== undefined ? inArguments.consentFilter : true;
+            $('#consentCheckbox').prop('checked', consentFilter);
+        }
+
+        // Aggiungi event listener per la checkbox
+        $('#consentCheckbox').on('change', function() {
+            consentFilter = this.checked;
+        });
     }
 
     function save() {
@@ -67,8 +68,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         var maxLongitude = coordinates.maxLongitude;
         var userLatitude = coordinates.Latitudine || "{{Contact.Attribute.LongitudineLatitudine.Latitudine}}";
         var userLongitude = coordinates.Longitudine || "{{Contact.Attribute.LongitudineLatitudine.Longitudine}}";
-        var consentCheckboxSelected = $('#consentCheckbox').is(':checked');
-    
+
         payload['arguments'].execute.inArguments = [{
             "minLatitude": minLatitude,
             "maxLatitude": maxLatitude,
@@ -76,21 +76,21 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             "maxLongitude": maxLongitude,
             "Latitudine": userLatitude,
             "Longitudine": userLongitude,
-            "Consenso": "{{Contact.Attribute.LongitudineLatitudine.Consenso}}",
             "SubscriberKey": "{{Contact.Key}}",
             "EmailAddress": "{{InteractionDefaults.Email}}",
-            "consentCheckboxSelected": consentCheckboxSelected
+            "consentFilter": consentFilter,
+            "Consenso": "{{Contact.Attribute.LongitudineLatitudine.Consenso}}"
         }];
-    
+
         payload['metaData'].isConfigured = true;
-    
+
         // Aggiorna l'etichetta del primo ramo
-        payload['outcomes'][0].metaData.label = `${selectedAddress}, ${selectedRadius}m`;
-    
+        var consentLabel = consentFilter ? " (solo con consenso)" : "";
+        payload['outcomes'][0].metaData.label = `${selectedAddress}, ${selectedRadius}m${consentLabel}`;
+
         console.log('Saving payload:', JSON.stringify(payload, null, 2));
         connection.trigger('updateActivity', payload);
     }
-
 
     function updateCoordinates(newCoordinates) {
         console.log('New coordinates updated:', newCoordinates);
@@ -100,11 +100,6 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     function updateAddressAndRadius(address, radius) {
         selectedAddress = address;
         selectedRadius = radius;
-    }
-
-    function updateConsentStatus(status) {
-        consentStatus = status;
-        console.log('Consent status updated:', consentStatus);
     }
 
     function initializeMap(callback) {
@@ -122,7 +117,6 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         save: save,
         updateCoordinates: updateCoordinates,
         updateAddressAndRadius: updateAddressAndRadius,
-        updateConsentStatus: updateConsentStatus,
         initializeMap: initializeMap
     };
 });
