@@ -76,9 +76,9 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             "maxLongitude": maxLongitude,
             "Latitudine": userLatitude,
             "Longitudine": userLongitude,
+            "Consenso": "{{Contact.Attribute.LongitudineLatitudine.Consenso}}",
             "SubscriberKey": "{{Contact.Key}}",
             "EmailAddress": "{{InteractionDefaults.Email}}",
-            "consentStatus": consentStatus,
             "consentCheckboxSelected": consentCheckboxSelected
         }];
     
@@ -90,6 +90,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         console.log('Saving payload:', JSON.stringify(payload, null, 2));
         connection.trigger('updateActivity', payload);
     }
+
 
     function updateCoordinates(newCoordinates) {
         console.log('New coordinates updated:', newCoordinates);
