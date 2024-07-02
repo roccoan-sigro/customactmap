@@ -7,7 +7,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     var coordinates = {};
     var selectedAddress = '';
     var selectedRadius = 0;
-    var consentFilter = true; // Aggiunto questa variabile
+    var consentFilter = true;
 
     $(window).ready(onRender);
 
@@ -45,18 +45,19 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
                 Longitudine: inArguments.Longitudine
             };
 
-            var centerLat = (parseFloat(coordinates.minLatitude) + parseFloat(coordinates.maxLatitude)) / 2;
-            var centerLng = (parseFloat(coordinates.minLongitude) + parseFloat(coordinates.maxLongitude)) / 2;
-
+            selectedRadius = inArguments.radius || 50;
             consentFilter = inArguments.consentFilter !== undefined ? inArguments.consentFilter : true;
             $('#consentCheckbox').prop('checked', consentFilter);
 
             initializeMap(function (addMarkerAndCircle) {
-                addMarkerAndCircle([centerLat, centerLng], 50);
+                addMarkerAndCircle({
+                    Latitudine: coordinates.Latitudine,
+                    Longitudine: coordinates.Longitudine,
+                    radius: selectedRadius
+                });
             });
         }
 
-        // Aggiungi event listener per la checkbox
         $('#consentCheckbox').on('change', function() {
             consentFilter = this.checked;
         });
@@ -77,6 +78,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             "maxLongitude": maxLongitude,
             "Latitudine": userLatitude,
             "Longitudine": userLongitude,
+            "radius": selectedRadius,
             "SubscriberKey": "{{Contact.Key}}",
             "EmailAddress": "{{InteractionDefaults.Email}}",
             "consentFilter": consentFilter,
@@ -85,7 +87,6 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
 
         payload['metaData'].isConfigured = true;
 
-        // Aggiorna l'etichetta del primo ramo
         var consentLabel = consentFilter ? " (solo con consenso)" : "";
         payload['outcomes'][0].metaData.label = `${selectedAddress}, ${selectedRadius}m${consentLabel}`;
 
@@ -105,11 +106,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
 
     function initializeMap(callback) {
         if (typeof callback === 'function') {
-            callback(function (latlng, radius) {
-                if (window.addMarkerAndCircle) {
-                    window.addMarkerAndCircle(latlng, radius);
-                }
-            });
+            callback(coordinates);
         }
     }
 
