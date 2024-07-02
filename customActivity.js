@@ -5,6 +5,8 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     var payload = {};
     var eventDefinitionKey = null;
     var coordinates = {};
+    var selectedAddress = '';
+    var selectedRadius = 0;
 
     $(window).ready(onRender);
 
@@ -42,25 +44,23 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
                 Longitudine: inArguments.Longitudine
             };
 
-            // Calcolare il centro e il raggio della selezione per ripristinare la mappa
             var centerLat = (parseFloat(coordinates.minLatitude) + parseFloat(coordinates.maxLatitude)) / 2;
             var centerLng = (parseFloat(coordinates.minLongitude) + parseFloat(coordinates.maxLongitude)) / 2;
 
-            // Inizializzare la mappa con la selezione salvata
             initializeMap(function (addMarkerAndCircle) {
-                addMarkerAndCircle([centerLat, centerLng], 50); // Imposta il raggio iniziale a 50 metri
+                addMarkerAndCircle([centerLat, centerLng], 50);
             });
         }
     }
 
-        function save() {
+    function save() {
         var minLatitude = coordinates.minLatitude;
         var maxLatitude = coordinates.maxLatitude;
         var minLongitude = coordinates.minLongitude;
         var maxLongitude = coordinates.maxLongitude;
         var userLatitude = coordinates.Latitudine || "{{Contact.Attribute.LongitudineLatitudine.Latitudine}}";
         var userLongitude = coordinates.Longitudine || "{{Contact.Attribute.LongitudineLatitudine.Longitudine}}";
-    
+
         payload['arguments'].execute.inArguments = [{
             "minLatitude": minLatitude,
             "maxLatitude": maxLatitude,
@@ -71,17 +71,24 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             "SubscriberKey": "{{Contact.Key}}",
             "EmailAddress": "{{InteractionDefaults.Email}}"
         }];
-    
+
         payload['metaData'].isConfigured = true;
-    
+
+        // Aggiorna l'etichetta del primo ramo
+        payload['outcomes'][0].metaData.label = `${selectedAddress}, ${selectedRadius}m`;
+
         console.log('Saving payload:', JSON.stringify(payload, null, 2));
         connection.trigger('updateActivity', payload);
     }
 
-
     function updateCoordinates(newCoordinates) {
         console.log('New coordinates updated:', newCoordinates);
         coordinates = newCoordinates;
+    }
+
+    function updateAddressAndRadius(address, radius) {
+        selectedAddress = address;
+        selectedRadius = radius;
     }
 
     function initializeMap(callback) {
@@ -98,6 +105,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         initialize: initialize,
         save: save,
         updateCoordinates: updateCoordinates,
+        updateAddressAndRadius: updateAddressAndRadius,
         initializeMap: initializeMap
     };
 });
