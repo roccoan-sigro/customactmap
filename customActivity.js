@@ -7,7 +7,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     var coordinates = {};
     var selectedAddress = '';
     var selectedRadius = 0;
-    var consentFilter = true;
+    var consentFilter = true; // Aggiunto questa variabile
 
     $(window).ready(onRender);
 
@@ -56,8 +56,10 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             });
         }
 
+        // Aggiungi event listener per la checkbox
         $('#consentCheckbox').on('change', function() {
             consentFilter = this.checked;
+            updateRecordCount();
         });
     }
 
@@ -84,6 +86,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
 
         payload['metaData'].isConfigured = true;
 
+        // Aggiorna l'etichetta del primo ramo
         var consentLabel = consentFilter ? " (solo con consenso)" : "";
         payload['outcomes'][0].metaData.label = `${selectedAddress}, ${selectedRadius}m${consentLabel}`;
 
@@ -94,11 +97,13 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     function updateCoordinates(newCoordinates) {
         console.log('New coordinates updated:', newCoordinates);
         coordinates = newCoordinates;
+        updateRecordCount();
     }
 
     function updateAddressAndRadius(address, radius) {
         selectedAddress = address;
         selectedRadius = radius;
+        updateRecordCount();
     }
 
     function initializeMap(callback) {
@@ -111,29 +116,28 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         }
     }
 
-    function updateRecordCount(coordinates, radius, consentOnly) {
-        fetch('https://mappa-protezione-civile-7987e051c9db.herokuapp.com/count-records', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                minLatitude: coordinates.minLatitude,
-                maxLatitude: coordinates.maxLatitude,
-                minLongitude: coordinates.minLongitude,
-                maxLongitude: coordinates.maxLongitude,
-                radius: radius,
-                consentOnly: consentOnly
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('recordCount').innerText = `Numero di record selezionati: ${data.count}`;
-        })
-        .catch(error => {
-            console.error('Errore nel conteggio dei record:', error);
-            document.getElementById('recordCount').innerText = 'Errore nel conteggio dei record';
-        });
+    async function updateRecordCount() {
+        const requestData = {
+            minLatitude: coordinates.minLatitude,
+            maxLatitude: coordinates.maxLatitude,
+            minLongitude: coordinates.minLongitude,
+            maxLongitude: coordinates.maxLongitude,
+            consentOnly: consentFilter
+        };
+
+        try {
+            const response = await fetch('/count-records', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+            const data = await response.json();
+            document.getElementById('recordCount').innerText = `Record Count: ${data.count}`;
+        } catch (error) {
+            console.error('Error fetching record count:', error);
+        }
     }
 
     return {
@@ -141,7 +145,6 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         save: save,
         updateCoordinates: updateCoordinates,
         updateAddressAndRadius: updateAddressAndRadius,
-        initializeMap: initializeMap,
-        updateRecordCount: updateRecordCount
+        initializeMap: initializeMap
     };
 });
