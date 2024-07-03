@@ -112,7 +112,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     }
 
     function updateRecordCount(coordinates, radius, consentOnly) {
-        fetch('https://your-heroku-app.herokuapp.com/count-records', {
+        fetch('https://mappa-protezione-civile-7987e051c9db.herokuapp.com/count-records', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
