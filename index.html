@@ -80,16 +80,24 @@
         }
 
         function getContactCount(coordinates, consentFilter) {
-            var script = document.createElement('script');
-            script.src = 'https://cloud.comunicazione.comune.roma.it/mapsel?' + $.param({
-                callback: 'handleContactCount',
-                minLatitude: coordinates.minLatitude,
-                maxLatitude: coordinates.maxLatitude,
-                minLongitude: coordinates.minLongitude,
-                maxLongitude: coordinates.maxLongitude,
-                consentFilter: consentFilter
+            $.ajax({
+                url: 'https://cloud.comunicazione.it/mapsel',
+                dataType: 'jsonp',
+                data: {
+                    minLatitude: coordinates.minLatitude,
+                    maxLatitude: coordinates.maxLatitude,
+                    minLongitude: coordinates.minLongitude,
+                    maxLongitude: coordinates.maxLongitude,
+                    consentFilter: consentFilter
+                },
+                success: function(data) {
+                    $('#contactCount').text('Contatti coinvolti: ' + data.count);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error('Errore nella richiesta JSONP:', textStatus, errorThrown);
+                    $('#contactCount').text('Errore nel recupero del conteggio');
+                }
             });
-            document.body.appendChild(script);
         }
 
         function handleContactCount(data) {
