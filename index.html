@@ -19,12 +19,12 @@
     <input type="range" id="radiusSlider" min="50" max="20000" step="50" value="50" >
     <input type="number" id="radiusInput" min="50" max="20000" step="50" value="50"> metri
     <div id="address">Indirizzo: </div>
-    <div id="contactCount">Contatti coinvolti: --</div>
     <hr>
     <div>
         <input type="checkbox" id="consentCheckbox" checked>
         <label for="consentCheckbox">Includi solo i contatti che hanno prestato il consenso</label>
     </div>
+    <div id="recordCount">Numero di record selezionati: Calcolo in corso...</div>
     <script src="js/require.js"></script>
 <script>
     require.config({
@@ -79,29 +79,8 @@
                 });
         }
 
-        function getContactCount(coordinates, consentFilter) {
-            $.ajax({
-                url: 'https://cloud.comunicazione.comune.roma.it/mapsel',
-                dataType: 'jsonp',
-                data: {
-                    minLatitude: coordinates.minLatitude,
-                    maxLatitude: coordinates.maxLatitude,
-                    minLongitude: coordinates.minLongitude,
-                    maxLongitude: coordinates.maxLongitude,
-                    consentFilter: consentFilter
-                },
-                success: function(data) {
-                    $('#contactCount').text('Contatti coinvolti: ' + data.count);
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.error('Errore nella richiesta JSONP:', textStatus, errorThrown);
-                    $('#contactCount').text('Errore nel recupero del conteggio');
-                }
-            });
-        }
-
-        function handleContactCount(data) {
-            $('#contactCount').text('Contatti coinvolti: ' + data.count);
+        function updateRecordCount(coordinates, radius, consentOnly) {
+            customActivity.updateRecordCount(coordinates, radius, consentOnly);
         }
 
         function addMarkerAndCircle(latlng, radius) {
@@ -149,8 +128,8 @@
             // Aggiorna l'indirizzo
             updateAddress(latlng);
 
-            // Ottieni il conteggio dei contatti
-            getContactCount(coordinates, $('#consentCheckbox').is(':checked'));
+            // Aggiorna il conteggio dei record
+            updateRecordCount(coordinates, radius, document.getElementById('consentCheckbox').checked);
         }
 
         map.on('click', (e) => {
@@ -192,17 +171,18 @@
             }
         });
 
-        // Ricarica le coordinate salvate, se presenti
-        customActivity.initializeMap(function (latlng, radius) {
-            if (latlng) {
+        document.getElementById('consentCheckbox').addEventListener('change', function() {
+            if (marker) {
+                const latlng = marker.getLatLng();
+                const radius = parseInt(radiusSlider.value);
                 addMarkerAndCircle(latlng, radius);
             }
         });
 
-        // Aggiorna il conteggio quando cambia lo stato del checkbox
-        $('#consentCheckbox').on('change', function() {
-            if (marker) {
-                addMarkerAndCircle(marker.getLatLng(), parseInt(radiusSlider.value));
+        // Ricarica le coordinate salvate, se presenti
+        customActivity.initializeMap(function (latlng, radius) {
+            if (latlng) {
+                addMarkerAndCircle(latlng, radius);
             }
         });
     });
