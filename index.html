@@ -19,13 +19,13 @@
     <input type="range" id="radiusSlider" min="50" max="20000" step="50" value="50" >
     <input type="number" id="radiusInput" min="50" max="20000" step="50" value="50"> metri
     <div id="address">Indirizzo: </div>
+    <div id="contactCount">Contatti coinvolti: --</div>
     <hr>
     <div>
         <input type="checkbox" id="consentCheckbox" checked>
         <label for="consentCheckbox">Includi solo i contatti che hanno prestato il consenso</label>
     </div>
     <script src="js/require.js"></script>
-<script src="js/require.js"></script>
 <script>
     require.config({
         paths: {
@@ -79,8 +79,22 @@
                 });
         }
 
+        function getContactCount(coordinates, consentFilter) {
+            var script = document.createElement('script');
+            script.src = 'https://cloud.comunicazione.comune.roma.it/mapsel?' + $.param({
+                callback: 'handleContactCount',
+                minLatitude: coordinates.minLatitude,
+                maxLatitude: coordinates.maxLatitude,
+                minLongitude: coordinates.minLongitude,
+                maxLongitude: coordinates.maxLongitude,
+                consentFilter: consentFilter
+            });
+            document.body.appendChild(script);
+        }
 
-
+        function handleContactCount(data) {
+            $('#contactCount').text('Contatti coinvolti: ' + data.count);
+        }
 
         function addMarkerAndCircle(latlng, radius) {
             if (!latlng) return;
@@ -115,15 +129,20 @@
             ];
             console.log('Coordinate rientranti nel cerchio:', latLngArray);
 
-            customActivity.updateCoordinates({
+            const coordinates = {
                 minLatitude: selectedMinLatitude,
                 maxLatitude: selectedMaxLatitude,
                 minLongitude: selectedMinLongitude,
                 maxLongitude: selectedMaxLongitude
-            });
+            };
+
+            customActivity.updateCoordinates(coordinates);
 
             // Aggiorna l'indirizzo
             updateAddress(latlng);
+
+            // Ottieni il conteggio dei contatti
+            getContactCount(coordinates, $('#consentCheckbox').is(':checked'));
         }
 
         map.on('click', (e) => {
@@ -169,6 +188,13 @@
         customActivity.initializeMap(function (latlng, radius) {
             if (latlng) {
                 addMarkerAndCircle(latlng, radius);
+            }
+        });
+
+        // Aggiorna il conteggio quando cambia lo stato del checkbox
+        $('#consentCheckbox').on('change', function() {
+            if (marker) {
+                addMarkerAndCircle(marker.getLatLng(), parseInt(radiusSlider.value));
             }
         });
     });
