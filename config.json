@@ -33,7 +33,7 @@
     ],
     "userInterfaces": {
         "configInspector": {
-            "size": "medium"
+            "size": "large"
         }
     },
     "arguments": {
