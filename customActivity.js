@@ -104,13 +104,37 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     }
 
     function initializeMap(callback) {
-        if (typeof callback === 'function') {
+        var state = loadMapState();
+        if (state && typeof callback === 'function') {
             callback(function (latlng, radius) {
                 if (window.addMarkerAndCircle) {
                     window.addMarkerAndCircle(latlng, radius);
                 }
             });
         }
+    }
+
+    function saveMapState(latlng, radius) {
+        selectedAddress = document.getElementById('address').innerText.replace('Indirizzo: ', '');
+        payload['arguments'].execute.inArguments[0] = {
+            ...payload['arguments'].execute.inArguments[0],
+            lat: latlng.lat,
+            lng: latlng.lng,
+            radius: radius,
+            consentFilter: consentFilter
+        };
+    }
+
+    function loadMapState() {
+        var inArguments = payload['arguments'].execute.inArguments[0];
+        if (inArguments) {
+            var latlng = { lat: inArguments.lat, lng: inArguments.lng };
+            var radius = inArguments.radius;
+            consentFilter = inArguments.consentFilter !== undefined ? inArguments.consentFilter : true;
+            $('#consentCheckbox').prop('checked', consentFilter);
+            return { latlng, radius };
+        }
+        return null;
     }
 
     return {
