@@ -7,7 +7,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     var coordinates = {};
     var selectedAddress = '';
     var selectedRadius = 0;
-    var consentFilter = true; // Aggiunto questa variabile
+    var consentFilter = true;
 
     $(window).ready(onRender);
 
@@ -56,7 +56,6 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             });
         }
 
-        // Aggiungi event listener per la checkbox
         $('#consentCheckbox').on('change', function() {
             consentFilter = this.checked;
         });
@@ -85,7 +84,6 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
 
         payload['metaData'].isConfigured = true;
 
-        // Aggiorna l'etichetta del primo ramo
         var consentLabel = consentFilter ? " (solo con consenso)" : "";
         payload['outcomes'][0].metaData.label = `${selectedAddress}, ${selectedRadius}m${consentLabel}`;
 
@@ -109,30 +107,26 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             callback(function (latlng, radius) {
                 if (window.addMarkerAndCircle) {
                     window.addMarkerAndCircle(latlng, radius);
+                    consentCheckbox.checked = state.consentFilter;
                 }
             });
         }
     }
 
-    function saveMapState(latlng, radius) {
-        selectedAddress = document.getElementById('address').innerText.replace('Indirizzo: ', '');
-        payload['arguments'].execute.inArguments[0] = {
-            ...payload['arguments'].execute.inArguments[0],
+    function saveMapState(latlng, radius, consentFilter) {
+        const mapState = {
             lat: latlng.lat,
             lng: latlng.lng,
             radius: radius,
             consentFilter: consentFilter
         };
+        localStorage.setItem('mapState', JSON.stringify(mapState));
     }
 
     function loadMapState() {
-        var inArguments = payload['arguments'].execute.inArguments[0];
-        if (inArguments) {
-            var latlng = { lat: inArguments.lat, lng: inArguments.lng };
-            var radius = inArguments.radius;
-            consentFilter = inArguments.consentFilter !== undefined ? inArguments.consentFilter : true;
-            $('#consentCheckbox').prop('checked', consentFilter);
-            return { latlng, radius };
+        const mapState = localStorage.getItem('mapState');
+        if (mapState) {
+            return JSON.parse(mapState);
         }
         return null;
     }
