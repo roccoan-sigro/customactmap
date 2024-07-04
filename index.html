@@ -194,7 +194,7 @@
             // Funzione per il conteggio dei record in base alle coordinate e al consenso
             function countRecords(minLatitude, maxLatitude, minLongitude, maxLongitude) {
                 console.log('Avvio del conteggio dei record...');
-                document.getElementById('recordCount').innerText = 'Record stimati: ...';
+                document.getElementById('recordCount').innerText = '...';
 
                 Papa.parse('input.csv', {
                     download: true,
@@ -220,11 +220,11 @@
                             }
                         }
 
-                        document.getElementById('recordCount').innerText = `Record stimati: ${count}`;
+                        document.getElementById('recordCount').innerText = ` ${count}`;
                         console.log(`Conteggio completato. Numero di record trovati: ${count}`);
                     },
                     error: function(error) {
-                        document.getElementById('recordCount').innerText = 'Record stimati: X';
+                        document.getElementById('recordCount').innerText = 'X';
                         console.error('Errore durante il conteggio dei record:', error);
                     }
                 });
