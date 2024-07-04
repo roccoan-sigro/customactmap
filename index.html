@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <meta name="googlebot" content="noindex">
     <title>Seleziona Area sulla Mappa</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -10,6 +12,26 @@
     <link href="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.min.css" rel="stylesheet">
     <link href="main.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <style>
+        #spinner {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ccc;
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
     <div id="map">
@@ -27,6 +49,7 @@
     </div>
 
     <div id="recordCount"></div>
+    <div id="spinner"></div>
 
     <script src="js/require.js"></script>
     <script>
@@ -49,6 +72,7 @@
 
             let marker;
             let circle;
+            let debounceTimeout;
 
             function updateAddress(latlng) {
                 if (!latlng) return;
@@ -126,10 +150,7 @@
                 updateAddress(latlng);
 
                 // Avvio del conteggio dei record dopo 3 secondi
-                setTimeout(function() {
-                    console.log('Avvio del conteggio dei record...');
-                    countRecords(selectedMinLatitude, selectedMaxLatitude, selectedMinLongitude, selectedMaxLongitude);
-                }, 3000);
+                debounce(countRecords, 3000, selectedMinLatitude, selectedMaxLatitude, selectedMinLongitude, selectedMaxLongitude);
             }
 
             map.on('click', (e) => {
@@ -170,8 +191,7 @@
                     const maxLongitude = bounds.getNorthEast().lng.toFixed(8);
 
                     console.log('Avvio del conteggio dei record per cambio stato della checkbox...');
-
-                    countRecords(minLatitude, maxLatitude, minLongitude, maxLongitude);
+                    debounce(countRecords, 3000, minLatitude, maxLatitude, minLongitude, maxLongitude);
                 }
             });
 
@@ -186,36 +206,50 @@
                 }
             });
 
+            // Funzione debounce per ritardare l'esecuzione
+            function debounce(func, wait, ...args) {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => func(...args), wait);
+            }
+
             // Funzione per il conteggio dei record in base alle coordinate e al consenso
             function countRecords(minLatitude, maxLatitude, minLongitude, maxLongitude) {
-                Papa.parse("input.csv", {
+                console.log('Avvio del conteggio dei record...');
+                document.getElementById('spinner').style.display = 'block';
+                document.getElementById('recordCount').innerText = '';
+
+                Papa.parse('input.csv', {
                     download: true,
                     header: true,
                     complete: function(results) {
+                        console.log('File CSV caricato con successo.');
                         const data = results.data;
+                        const includeConsent = consentCheckbox.checked;
+
                         let count = 0;
+                        for (let i = 0; i < data.length; i++) {
+                            const record = data[i];
+                            const latitude = parseFloat(record.Latitudine);
+                            const longitude = parseFloat(record.Longitudine);
+                            const consent = parseInt(record.Consenso, 10);
 
-                        data.forEach(row => {
-                            const lat = parseFloat(row.Latitudine);
-                            const lng = parseFloat(row.Longitudine);
-                            const consent = row.Consenso === "1";
-
-                            if (lat >= minLatitude && lat <= maxLatitude &&
-                                lng >= minLongitude && lng <= maxLongitude &&
-                                (!document.getElementById('consentCheckbox').checked || (document.getElementById('consentCheckbox').checked && consent))) {
+                            if (
+                                latitude >= minLatitude && latitude <= maxLatitude &&
+                                longitude >= minLongitude && longitude <= maxLongitude &&
+                                (!includeConsent || consent === 1)
+                            ) {
                                 count++;
                             }
-                        });
+                        }
 
-                        // Visualizza il risultato nel div desiderato
-                        const resultDiv = document.getElementById('recordCount');
-                        resultDiv.innerText = `Numero di record stimati: ${count}`;
+                        document.getElementById('spinner').style.display = 'none';
+                        document.getElementById('recordCount').innerText = `Numero di record trovati: ${count}`;
                         console.log(`Conteggio completato. Numero di record trovati: ${count}`);
                     },
                     error: function(error) {
-                        console.error('Errore durante la stima:', error);
-                        const resultDiv = document.getElementById('recordCount');
-                        resultDiv.innerText = 'Errore durante la stima';
+                        document.getElementById('spinner').style.display = 'none';
+                        document.getElementById('recordCount').innerText = 'Errore durante il conteggio dei record';
+                        console.error('Errore durante il conteggio dei record:', error);
                     }
                 });
             }
