@@ -17,7 +17,7 @@
             <img src="https://www.comune.roma.it/web-resources/static/img/logo_roma_header_white.png" alt="Logo Roma">
         </div>
     </div>
-    <input type="range" id="radiusSlider" min="50" max="20000" step="50" value="50" >
+    <input type="range" id="radiusSlider" min="50" max="20000" step="50" value="50">
     <input type="number" id="radiusInput" min="50" max="20000" step="50" value="50"> metri
     <div id="address">Indirizzo: </div>
     <hr>
@@ -143,6 +143,7 @@
 
             const radiusSlider = document.getElementById('radiusSlider');
             const radiusInput = document.getElementById('radiusInput');
+            const consentCheckbox = document.getElementById('consentCheckbox');
 
             radiusSlider.addEventListener('input', () => {
                 const radius = parseInt(radiusSlider.value);
@@ -157,6 +158,20 @@
                 radiusSlider.value = radius;
                 if (marker) {
                     addMarkerAndCircle(marker.getLatLng(), radius);
+                }
+            });
+
+            consentCheckbox.addEventListener('change', () => {
+                if (marker && circle) {
+                    const bounds = circle.getBounds();
+                    const minLatitude = bounds.getSouthWest().lat.toFixed(8);
+                    const maxLatitude = bounds.getNorthEast().lat.toFixed(8);
+                    const minLongitude = bounds.getSouthWest().lng.toFixed(8);
+                    const maxLongitude = bounds.getNorthEast().lng.toFixed(8);
+
+                    console.log('Avvio del conteggio dei record per cambio stato della checkbox...');
+
+                    countRecords(minLatitude, maxLatitude, minLongitude, maxLongitude);
                 }
             });
 
@@ -194,13 +209,13 @@
 
                         // Visualizza il risultato nel div desiderato
                         const resultDiv = document.getElementById('recordCount');
-                        resultDiv.innerText = `Numero di record trovati: ${count}`;
+                        resultDiv.innerText = `Numero di record stimati: ${count}`;
                         console.log(`Conteggio completato. Numero di record trovati: ${count}`);
                     },
                     error: function(error) {
-                        console.error('Errore durante il parsing del file CSV:', error);
+                        console.error('Errore durante la stima:', error);
                         const resultDiv = document.getElementById('recordCount');
-                        resultDiv.innerText = 'Errore durante il conteggio dei record.';
+                        resultDiv.innerText = 'Errore durante la stima';
                     }
                 });
             }
@@ -213,6 +228,5 @@
             });
         });
     </script>
-
 </body>
 </html>
