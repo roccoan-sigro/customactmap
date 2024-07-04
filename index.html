@@ -17,7 +17,7 @@
 </head>
 <body>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-7">
             <div id="map">
                 <div id="mapImage">
                     <img src="https://www.comune.roma.it/web-resources/static/img/logo_roma_header_white.png" alt="Logo Roma">
@@ -26,15 +26,18 @@
             <input type="range" id="radiusSlider" min="50" max="20000" step="50" value="50">
             <input type="number" id="radiusInput" min="50" max="20000" step="50" value="50"> metri
         </div>
-        <div class="col-md-6">
-            <div id="address">Indirizzo: </div>
+        <div class="col-md-5">
+            <div class="m-2 fw-bold fs-2" id="address">Indirizzo: </div>
             <hr>
             <div>
-                <input type="checkbox" id="consentCheckbox" checked>
+                <input type="checkbox" id="consentCheckbox" class="fs-3" checked>
                 <label for="consentCheckbox">Includi solo i contatti che hanno prestato il consenso</label>
             </div>
-        
-            Record stimati: <div id="recordCount">...</div>
+            <hr>
+            <div class="fs-3 fw-bold">
+                Record stimati: <div id="recordCount">...</div>
+            </div>
+            
         </div>
     </div>
 
