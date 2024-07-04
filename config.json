@@ -41,6 +41,7 @@
             "inArguments": [
                 { "SubscriberKey": "{{Contact.Key}}" },
                 { "EmailAddress": "{{InteractionDefaults.Email}}" },
+                { "Phone": "{{Contact.Default.PhoneNumber}}" },
                 { "Consenso": "{{Contact.Attribute.LongitudineLatitudine.Consenso}}" },
                 { "Latitudine": "{{Contact.Attribute.LongitudineLatitudine.Latitudine}}" },
                 { "Longitudine": "{{Contact.Attribute.LongitudineLatitudine.Longitudine}}" },
