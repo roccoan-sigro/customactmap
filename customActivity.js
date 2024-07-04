@@ -6,7 +6,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     var eventDefinitionKey = null;
     var coordinates = {};
     var selectedAddress = '';
-    var selectedRadius = 0;
+    var selectedRadius = 50;
     var consentFilter = true;
 
     $(window).ready(onRender);
@@ -27,14 +27,25 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             payload = data;
         }
 
-        var hasInArguments = Boolean(
-            payload['arguments'] &&
-            payload['arguments'].execute &&
-            payload['arguments'].execute.inArguments &&
-            payload['arguments'].execute.inArguments.length > 0
-        );
-
-        if (hasInArguments) {
+        var state = loadMapState();
+        if (state) {
+            coordinates = {
+                minLatitude: state.lat - (state.radius / 111111),
+                maxLatitude: state.lat + (state.radius / 111111),
+                minLongitude: state.lng - (state.radius / (111111 * Math.cos(state.lat * Math.PI / 180))),
+                maxLongitude: state.lng + (state.radius / (111111 * Math.cos(state.lat * Math.PI / 180))),
+                Latitudine: state.lat,
+                Longitudine: state.lng
+            };
+            selectedRadius = state.radius;
+            consentFilter = state.consentFilter;
+            $('#consentCheckbox').prop('checked', consentFilter);
+            $('#radiusSlider').val(selectedRadius);
+            $('#radiusInput').val(selectedRadius);
+        } else if (payload['arguments'] && 
+                   payload['arguments'].execute && 
+                   payload['arguments'].execute.inArguments && 
+                   payload['arguments'].execute.inArguments.length > 0) {
             var inArguments = payload['arguments'].execute.inArguments[0];
             coordinates = {
                 minLatitude: inArguments.minLatitude,
@@ -44,20 +55,24 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
                 Latitudine: inArguments.Latitudine,
                 Longitudine: inArguments.Longitudine
             };
-
-            var centerLat = (parseFloat(coordinates.minLatitude) + parseFloat(coordinates.maxLatitude)) / 2;
-            var centerLng = (parseFloat(coordinates.minLongitude) + parseFloat(coordinates.maxLongitude)) / 2;
-
+            selectedRadius = inArguments.selectedRadius || 50;
             consentFilter = inArguments.consentFilter !== undefined ? inArguments.consentFilter : true;
             $('#consentCheckbox').prop('checked', consentFilter);
-
-            initializeMap(function (addMarkerAndCircle) {
-                addMarkerAndCircle([centerLat, centerLng], 50);
-            });
+            $('#radiusSlider').val(selectedRadius);
+            $('#radiusInput').val(selectedRadius);
         }
+
+        initializeMap(function (addMarkerAndCircle) {
+            if (state) {
+                addMarkerAndCircle([state.lat, state.lng], state.radius);
+            } else if (coordinates.Latitudine && coordinates.Longitudine) {
+                addMarkerAndCircle([coordinates.Latitudine, coordinates.Longitudine], selectedRadius);
+            }
+        });
 
         $('#consentCheckbox').on('change', function() {
             consentFilter = this.checked;
+            saveMapState();
         });
     }
 
@@ -79,7 +94,8 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             "SubscriberKey": "{{Contact.Key}}",
             "EmailAddress": "{{InteractionDefaults.Email}}",
             "consentFilter": consentFilter,
-            "Consenso": "{{Contact.Attribute.LongitudineLatitudine.Consenso}}"
+            "Consenso": "{{Contact.Attribute.LongitudineLatitudine.Consenso}}",
+            "selectedRadius": selectedRadius
         }];
 
         payload['metaData'].isConfigured = true;
@@ -94,30 +110,32 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     function updateCoordinates(newCoordinates) {
         console.log('New coordinates updated:', newCoordinates);
         coordinates = newCoordinates;
+        saveMapState();
     }
 
     function updateAddressAndRadius(address, radius) {
         selectedAddress = address;
         selectedRadius = radius;
+        saveMapState();
     }
 
     function initializeMap(callback) {
-        var state = loadMapState();
-        if (state && typeof callback === 'function') {
+        if (typeof callback === 'function') {
             callback(function (latlng, radius) {
                 if (window.addMarkerAndCircle) {
                     window.addMarkerAndCircle(latlng, radius);
-                    consentCheckbox.checked = state.consentFilter;
                 }
             });
         }
     }
 
-    function saveMapState(latlng, radius, consentFilter) {
+    function saveMapState() {
+        if (!coordinates.Latitudine || !coordinates.Longitudine) return;
+        
         const mapState = {
-            lat: latlng.lat,
-            lng: latlng.lng,
-            radius: radius,
+            lat: coordinates.Latitudine,
+            lng: coordinates.Longitudine,
+            radius: selectedRadius,
             consentFilter: consentFilter
         };
         localStorage.setItem('mapState', JSON.stringify(mapState));
@@ -136,6 +154,8 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         save: save,
         updateCoordinates: updateCoordinates,
         updateAddressAndRadius: updateAddressAndRadius,
-        initializeMap: initializeMap
+        initializeMap: initializeMap,
+        saveMapState: saveMapState,
+        loadMapState: loadMapState
     };
 });
