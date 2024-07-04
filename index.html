@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.min.css" rel="stylesheet">
     <link href="main.css" rel="stylesheet">
 </head>
@@ -24,9 +25,9 @@
         <input type="checkbox" id="consentCheckbox" checked>
         <label for="consentCheckbox">Includi solo i contatti che hanno prestato il consenso</label>
     </div>
-    <div id="estimatedRecords">Stima record coinvolti: </div>
+    <div id="recordCount"></div>
     <script src="js/require.js"></script>
-
+<script src="js/require.js"></script>
 <script>
     require.config({
         paths: {
@@ -173,52 +174,51 @@
             }
         });
     });
-
-    // Funzione per calcolare il numero di record basato sul raggio
-function calculateEstimatedRecords(radius, consentChecked) {
-    // Calcola il lato del quadrato circoscritto
-    const sideLength = 2 * radius;
-
-    // Calcola l'area del quadrato
-    const areaSquareMeters = Math.pow(sideLength, 2);
-
-    // Converti l'area da metri quadrati a chilometri quadrati
-    const areaSquareKm = areaSquareMeters / 1000000;
-
-    // Densità abitativa in ab/km²
-    const density = consentChecked ? 157 : 528;
-
-    // Calcola il numero stimato di record
-    const estimatedRecords = Math.round(areaSquareKm * density);
-
-    return estimatedRecords;
-}
-
-// Funzione per aggiornare l'UI con il numero stimato di record
-function updateEstimatedRecords(radius, consentChecked) {
-    const estimatedRecords = calculateEstimatedRecords(radius, consentChecked);
-    const estimatedRecordsElement = document.getElementById('estimatedRecords');
-    estimatedRecordsElement.innerText = `Stima record coinvolti: ${estimatedRecords}`;
-}
-
-// Aggiorna il conteggio iniziale
-updateEstimatedRecords(parseInt(radiusSlider.value), document.getElementById('consentCheckbox').checked);
-
-// Aggiorna l'UI quando il raggio cambia
-radiusSlider.addEventListener('input', () => {
-    const radius = parseInt(radiusSlider.value);
-    const consentChecked = document.getElementById('consentCheckbox').checked;
-    updateEstimatedRecords(radius, consentChecked);
-});
-
-// Aggiorna l'UI quando la casella di consenso cambia
-consentCheckbox.addEventListener('change', () => {
-    const radius = parseInt(radiusSlider.value);
-    const consentChecked = document.getElementById('consentCheckbox').checked;
-    updateEstimatedRecords(radius, consentChecked);
-});
-
 </script>
+
+    <script>
+        // Funzione per il conteggio dei record in base alla selezione sulla mappa
+        function countRecords(minLatitude, maxLatitude, minLongitude, maxLongitude, includeConsent) {
+            Papa.parse("input.csv", {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    const data = results.data;
+                    let count = 0;
+        
+                    data.forEach(row => {
+                        const lat = parseFloat(row.Latitudine);
+                        const lng = parseFloat(row.Longitudine);
+                        const consent = row.Consenso === "1";
+        
+                        if (lat >= minLatitude && lat <= maxLatitude &&
+                            lng >= minLongitude && lng <= maxLongitude &&
+                            (!includeConsent || (includeConsent && consent))) {
+                            count++;
+                        }
+                    });
+        
+                    // Visualizza il risultato nel div desiderato (aggiorna l'ID del div secondo la tua struttura HTML)
+                    const resultDiv = document.getElementById('recordCount');
+                    resultDiv.innerText = `Numero di record trovati: ${count}`;
+                }
+            });
+        }
+        
+        // Evento per avviare il conteggio 3 secondi dopo la fine della selezione sulla mappa
+        map.on('mouseup', function() {
+            setTimeout(function() {
+                const bounds = circle.getBounds();
+                const minLatitude = bounds.getSouthWest().lat;
+                const maxLatitude = bounds.getNorthEast().lat;
+                const minLongitude = bounds.getSouthWest().lng;
+                const maxLongitude = bounds.getNorthEast().lng;
+                const includeConsent = document.getElementById('consentCheckbox').checked;
+        
+                countRecords(minLatitude, maxLatitude, minLongitude, maxLongitude, includeConsent);
+            }, 3000); // Attendere 3 secondi prima di avviare il conteggio
+        });
+        </script>
 
 </body>
 </html>
