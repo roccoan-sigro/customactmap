@@ -48,7 +48,7 @@
         <label for="consentCheckbox">Includi solo i contatti che hanno prestato il consenso</label>
     </div>
 
-    <div id="recordCount"></div>
+    Record coinvolti stimati: <div id="recordCount"></div>
     <div id="spinner"></div>
 
     <script src="js/require.js"></script>
@@ -243,12 +243,12 @@
                         }
 
                         document.getElementById('spinner').style.display = 'none';
-                        document.getElementById('recordCount').innerText = `Numero di record trovati: ${count}`;
+                        document.getElementById('recordCount').innerText = ` ${count}`;
                         console.log(`Conteggio completato. Numero di record trovati: ${count}`);
                     },
                     error: function(error) {
                         document.getElementById('spinner').style.display = 'none';
-                        document.getElementById('recordCount').innerText = 'Errore durante il conteggio dei record';
+                        document.getElementById('recordCount').innerText = 'X';
                         console.error('Errore durante il conteggio dei record:', error);
                     }
                 });
