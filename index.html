@@ -146,6 +146,8 @@
 
                 // Avvio del conteggio dei record dopo 3 secondi
                 debounce(countRecords, 3000, selectedMinLatitude, selectedMaxLatitude, selectedMinLongitude, selectedMaxLongitude);
+
+                customActivity.saveMapState();
             }
 
             map.on('click', (e) => {
