@@ -12,26 +12,6 @@
     <link href="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.min.css" rel="stylesheet">
     <link href="main.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <style>
-        #spinner {
-            display: none;
-            width: 50px;
-            height: 50px;
-            border: 5px solid #ccc;
-            border-top-color: #000;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
 </head>
 <body>
     <div id="map">
@@ -48,8 +28,7 @@
         <label for="consentCheckbox">Includi solo i contatti che hanno prestato il consenso</label>
     </div>
 
-    Record coinvolti stimati: <div id="recordCount"></div>
-    <div id="spinner"></div>
+    Record stimati: <div id="recordCount">...</div>
 
     <script src="js/require.js"></script>
     <script>
@@ -215,8 +194,7 @@
             // Funzione per il conteggio dei record in base alle coordinate e al consenso
             function countRecords(minLatitude, maxLatitude, minLongitude, maxLongitude) {
                 console.log('Avvio del conteggio dei record...');
-                document.getElementById('spinner').style.display = 'block';
-                document.getElementById('recordCount').innerText = '';
+                document.getElementById('recordCount').innerText = 'Record stimati: ...';
 
                 Papa.parse('input.csv', {
                     download: true,
@@ -242,13 +220,11 @@
                             }
                         }
 
-                        document.getElementById('spinner').style.display = 'none';
-                        document.getElementById('recordCount').innerText = ` ${count}`;
+                        document.getElementById('recordCount').innerText = `Record stimati: ${count}`;
                         console.log(`Conteggio completato. Numero di record trovati: ${count}`);
                     },
                     error: function(error) {
-                        document.getElementById('spinner').style.display = 'none';
-                        document.getElementById('recordCount').innerText = 'X';
+                        document.getElementById('recordCount').innerText = 'Record stimati: X';
                         console.error('Errore durante il conteggio dei record:', error);
                     }
                 });
