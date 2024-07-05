@@ -84,24 +84,27 @@
             }
 
             window.addMarkerAndCircle = function(latlng, radius) {
-                if (!latlng) return;
-
+                if (!latlng || typeof latlng.lat !== 'number' || typeof latlng.lng !== 'number') {
+                    console.error('Coordinate non valide:', latlng);
+                    return;
+                }
+            
                 if (marker) map.removeLayer(marker);
                 if (circle) map.removeLayer(circle);
-
+            
                 marker = L.marker(latlng).addTo(map);
                 circle = L.circle(latlng, {
                     radius: radius,
                     color: '#8e001c',
                     fillOpacity: 0.2
                 }).addTo(map);
-
+            
                 const bounds = circle.getBounds();
                 const selectedMinLatitude = bounds.getSouthWest().lat.toFixed(8);
                 const selectedMaxLatitude = bounds.getNorthEast().lat.toFixed(8);
                 const selectedMinLongitude = bounds.getSouthWest().lng.toFixed(8);
                 const selectedMaxLongitude = bounds.getNorthEast().lng.toFixed(8);
-
+            
                 customActivity.updateCoordinates({
                     minLatitude: selectedMinLatitude,
                     maxLatitude: selectedMaxLatitude,
@@ -110,44 +113,56 @@
                     Latitudine: latlng.lat,
                     Longitudine: latlng.lng
                 });
-
+            
                 updateAddress(latlng);
                 debounce(countRecords, 3000, selectedMinLatitude, selectedMaxLatitude, selectedMinLongitude, selectedMaxLongitude);
                 customActivity.saveMapState();
             }
 
             function updateAddress(latlng) {
-                if (!latlng) return;
-
+                if (!latlng || typeof latlng.lat !== 'number' || typeof latlng.lng !== 'number') {
+                    console.error('Coordinate non valide:', latlng);
+                    document.getElementById('address').innerText = 'Indirizzo: Non disponibile';
+                    return;
+                }
+            
                 fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latlng.lat}&lon=${latlng.lng}&format=jsonv2`)
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        const road = data.address.road || '';
-                        const houseNumber = data.address.house_number || '';
-                        const city = data.address.city || '';
-
-                        let address = '';
-                        if (road && houseNumber) {
-                            address += `${road}, ${houseNumber}`;
-                        } else if (road) {
-                            address += `${road}`;
-                        } else if (houseNumber) {
-                            address += `${houseNumber}`;
+                        let address = 'Indirizzo: ';
+                        if (data.address) {
+                            const road = data.address.road || '';
+                            const houseNumber = data.address.house_number || '';
+                            const city = data.address.city || data.address.town || data.address.village || '';
+            
+                            if (road && houseNumber) {
+                                address += `${road}, ${houseNumber}`;
+                            } else if (road) {
+                                address += `${road}`;
+                            } else if (houseNumber) {
+                                address += `${houseNumber}`;
+                            }
+            
+                            if (city) {
+                                address += address ? `, ${city}` : city;
+                            }
+                        } else {
+                            address += 'Non disponibile';
                         }
-
-                        if (city) {
-                            address += `, ${city}`;
-                        }
-
-                        document.getElementById('address').innerText = `Indirizzo: ${address}`;
-                        customActivity.updateAddressAndRadius(address, radiusSlider.value);
+            
+                        document.getElementById('address').innerText = address;
+                        customActivity.updateAddressAndRadius(address, document.getElementById('radiusSlider').value);
                     })
                     .catch(error => {
                         console.error('Errore durante il recupero dell\'indirizzo:', error);
-                        document.getElementById('address').innerText = 'Indirizzo non disponibile';
+                        document.getElementById('address').innerText = 'Indirizzo: Non disponibile';
                     });
             }
-
             function debounce(func, wait, ...args) {
                 clearTimeout(debounceTimeout);
                 debounceTimeout = setTimeout(() => func(...args), wait);
