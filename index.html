@@ -23,9 +23,9 @@
                     <img src="https://www.comune.roma.it/web-resources/static/img/logo_roma_header_white.png" alt="Logo Roma">
                 </div>
             </div>
-                <p class="fs-4 fw-bold ms-1" style="color: #8e001c; ">RAGGIO: </p>
-                    <input type="range" id="radiusSlider" min="50" max="20000" step="50" value="50">
-                    <input type="number" id="radiusInput" min="50" max="20000" step="50" value="50"> metri
+            <p class="fs-4 fw-bold ms-1" style="color: #8e001c; ">RAGGIO: </p>
+            <input type="range" id="radiusSlider" min="50" max="20000" step="50" value="50">
+            <input type="number" id="radiusInput" min="50" max="20000" step="50" value="50"> metri
         </div>
         <div class="col-md-5">
             <div class="m-2 fw-bold fs-2" id="address">Indirizzo: </div>
@@ -38,7 +38,6 @@
             <div class="fs-3 fw-bold">
                 Record stimati: <div id="recordCount">...</div>
             </div>
-            
         </div>
     </div>
 
@@ -53,17 +52,69 @@
         });
 
         require(['jquery', 'postmonger', 'customActivity'], function ($, Postmonger, customActivity) {
-            const map = L.map('map', { attributionControl: false }).setView([41.9028, 12.4964], 13); // Centro su Roma
+            let map, marker, circle, debounceTimeout;
+            const radiusSlider = document.getElementById('radiusSlider');
+            const radiusInput = document.getElementById('radiusInput');
+            const consentCheckbox = document.getElementById('consentCheckbox');
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            function initMap() {
+                map = L.map('map', { attributionControl: false }).setView([41.9028, 12.4964], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-            const geocoder = L.Control.geocoder({
-                defaultMarkGeocode: false
-            }).addTo(map);
+                const geocoder = L.Control.geocoder({
+                    defaultMarkGeocode: false
+                }).addTo(map);
 
-            let marker;
-            let circle;
-            let debounceTimeout;
+                map.on('click', (e) => {
+                    addMarkerAndCircle(e.latlng, parseInt(radiusSlider.value));
+                });
+
+                geocoder.on('markgeocode', function (e) {
+                    map.fitBounds(e.geocode.bbox);
+                    addMarkerAndCircle(e.geocode.center, parseInt(radiusSlider.value));
+                });
+
+                map.whenReady(function() {
+                    customActivity.initializeMap(function (latlng, radius) {
+                        if (latlng) {
+                            addMarkerAndCircle(latlng, radius);
+                        }
+                    });
+                });
+            }
+
+            window.addMarkerAndCircle = function(latlng, radius) {
+                if (!latlng) return;
+
+                if (marker) map.removeLayer(marker);
+                if (circle) map.removeLayer(circle);
+
+                marker = L.marker(latlng).addTo(map);
+                circle = L.circle(latlng, {
+                    radius: radius,
+                    color: '#8e001c',
+                    fillOpacity: 0.2
+                }).addTo(map);
+
+                const bounds = circle.getBounds();
+                const selectedMinLatitude = bounds.getSouthWest().lat.toFixed(8);
+                const selectedMaxLatitude = bounds.getNorthEast().lat.toFixed(8);
+                const selectedMinLongitude = bounds.getSouthWest().lng.toFixed(8);
+                const selectedMaxLongitude = bounds.getNorthEast().lng.toFixed(8);
+
+                customActivity.updateCoordinates({
+                    minLatitude: selectedMinLatitude,
+                    maxLatitude: selectedMaxLatitude,
+                    minLongitude: selectedMinLongitude,
+                    maxLongitude: selectedMaxLongitude,
+                    Latitudine: latlng.lat,
+                    Longitudine: latlng.lng
+                });
+
+                updateAddress(latlng);
+                debounce(countRecords, 3000, selectedMinLatitude, selectedMaxLatitude, selectedMinLongitude, selectedMaxLongitude);
+                customActivity.saveMapState();
+            }
 
             function updateAddress(latlng) {
                 if (!latlng) return;
@@ -97,115 +148,11 @@
                     });
             }
 
-            function addMarkerAndCircle(latlng, radius) {
-                if (!latlng) return;
-
-                // Rimuove marcatore e cerchio esistenti
-                if (marker) {
-                    map.removeLayer(marker);
-                    marker = null;
-                }
-                if (circle) {
-                    map.removeLayer(circle);
-                    circle = null;
-                }
-
-                // Aggiunge nuovo marcatore e cerchio
-                marker = L.marker(latlng).addTo(map);
-                circle = L.circle(latlng, {
-                    radius: radius,
-                    color: '#8e001c',
-                    fillOpacity: 0.2
-                }).addTo(map);
-
-                const bounds = circle.getBounds();
-                const selectedMinLatitude = bounds.getSouthWest().lat.toFixed(8);
-                const selectedMaxLatitude = bounds.getNorthEast().lat.toFixed(8);
-                const selectedMinLongitude = bounds.getSouthWest().lng.toFixed(8);
-                const selectedMaxLongitude = bounds.getNorthEast().lng.toFixed(8);
-
-                const latLngArray = [
-                    [selectedMinLatitude, selectedMinLongitude],
-                    [selectedMaxLatitude, selectedMaxLongitude]
-                ];
-                console.log('Coordinate rientranti nel cerchio:', latLngArray);
-
-                customActivity.updateCoordinates({
-                    minLatitude: selectedMinLatitude,
-                    maxLatitude: selectedMaxLatitude,
-                    minLongitude: selectedMinLongitude,
-                    maxLongitude: selectedMaxLongitude
-                });
-
-                // Aggiorna l'indirizzo
-                updateAddress(latlng);
-
-                // Avvio del conteggio dei record dopo 3 secondi
-                debounce(countRecords, 3000, selectedMinLatitude, selectedMaxLatitude, selectedMinLongitude, selectedMaxLongitude);
-
-                customActivity.saveMapState();
-            }
-
-            map.on('click', (e) => {
-                addMarkerAndCircle(e.latlng, parseInt(radiusSlider.value));
-            });
-
-            geocoder.on('markgeocode', function (e) {
-                map.fitBounds(e.geocode.bbox);
-                addMarkerAndCircle(e.geocode.center, parseInt(radiusSlider.value));
-            });
-
-            const radiusSlider = document.getElementById('radiusSlider');
-            const radiusInput = document.getElementById('radiusInput');
-            const consentCheckbox = document.getElementById('consentCheckbox');
-
-            radiusSlider.addEventListener('input', () => {
-                const radius = parseInt(radiusSlider.value);
-                radiusInput.value = radius;
-                if (marker) {
-                    addMarkerAndCircle(marker.getLatLng(), radius);
-                }
-            });
-
-            radiusInput.addEventListener('input', () => {
-                const radius = parseInt(radiusInput.value);
-                radiusSlider.value = radius;
-                if (marker) {
-                    addMarkerAndCircle(marker.getLatLng(), radius);
-                }
-            });
-
-            consentCheckbox.addEventListener('change', () => {
-                if (marker && circle) {
-                    const bounds = circle.getBounds();
-                    const minLatitude = bounds.getSouthWest().lat.toFixed(8);
-                    const maxLatitude = bounds.getNorthEast().lat.toFixed(8);
-                    const minLongitude = bounds.getSouthWest().lng.toFixed(8);
-                    const maxLongitude = bounds.getNorthEast().lng.toFixed(8);
-
-                    console.log('Avvio del conteggio dei record per cambio stato della checkbox...');
-                    debounce(countRecords, 3000, minLatitude, maxLatitude, minLongitude, maxLongitude);
-                }
-            });
-
-            // Aggiorna il marker e il cerchio quando lo zoom cambia
-            map.on('zoomend', () => {
-                if (marker && circle) {
-                    const latlng = marker.getLatLng();
-                    if (latlng) {
-                        const radius = parseInt(radiusSlider.value);
-                        addMarkerAndCircle(latlng, radius);
-                    }
-                }
-            });
-
-            // Funzione debounce per ritardare l'esecuzione
             function debounce(func, wait, ...args) {
                 clearTimeout(debounceTimeout);
                 debounceTimeout = setTimeout(() => func(...args), wait);
             }
 
-            // Funzione per il conteggio dei record in base alle coordinate e al consenso
             function countRecords(minLatitude, maxLatitude, minLongitude, maxLongitude) {
                 console.log('Avvio del conteggio dei record...');
                 document.getElementById('recordCount').innerText = '...';
@@ -244,12 +191,38 @@
                 });
             }
 
-            // Ricarica le coordinate salvate, se presenti
-            customActivity.initializeMap(function (latlng, radius) {
-                if (latlng) {
-                    addMarkerAndCircle(latlng, radius);
+            radiusSlider.addEventListener('input', () => {
+                const radius = parseInt(radiusSlider.value);
+                radiusInput.value = radius;
+                if (marker) {
+                    addMarkerAndCircle(marker.getLatLng(), radius);
                 }
             });
+
+            radiusInput.addEventListener('input', () => {
+                const radius = parseInt(radiusInput.value);
+                radiusSlider.value = radius;
+                if (marker) {
+                    addMarkerAndCircle(marker.getLatLng(), radius);
+                }
+            });
+
+            consentCheckbox.addEventListener('change', () => {
+                if (marker && circle) {
+                    const bounds = circle.getBounds();
+                    const minLatitude = bounds.getSouthWest().lat.toFixed(8);
+                    const maxLatitude = bounds.getNorthEast().lat.toFixed(8);
+                    const minLongitude = bounds.getSouthWest().lng.toFixed(8);
+                    const maxLongitude = bounds.getNorthEast().lng.toFixed(8);
+
+                    console.log('Avvio del conteggio dei record per cambio stato della checkbox...');
+                    debounce(countRecords, 3000, minLatitude, maxLatitude, minLongitude, maxLongitude);
+                }
+                customActivity.saveMapState();
+            });
+
+            initMap();
+            customActivity.initialize();
         });
     </script>
 </body>
