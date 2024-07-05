@@ -39,9 +39,16 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             };
             selectedRadius = state.radius;
             consentFilter = state.consentFilter;
+            selectedAddress = state.address || '';
+
             $('#consentCheckbox').prop('checked', consentFilter);
             $('#radiusSlider').val(selectedRadius);
             $('#radiusInput').val(selectedRadius);
+            $('#address').text('Indirizzo: ' + selectedAddress);
+
+            if (typeof window.addMarkerAndCircle === 'function') {
+                window.addMarkerAndCircle([state.lat, state.lng], state.radius);
+            }
         } else if (payload['arguments'] && 
                    payload['arguments'].execute && 
                    payload['arguments'].execute.inArguments && 
@@ -57,23 +64,17 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             };
             selectedRadius = inArguments.selectedRadius || 50;
             consentFilter = inArguments.consentFilter !== undefined ? inArguments.consentFilter : true;
+            selectedAddress = inArguments.selectedAddress || '';
+
             $('#consentCheckbox').prop('checked', consentFilter);
             $('#radiusSlider').val(selectedRadius);
             $('#radiusInput').val(selectedRadius);
-        }
+            $('#address').text('Indirizzo: ' + selectedAddress);
 
-        initializeMap(function (addMarkerAndCircle) {
-            if (state) {
-                addMarkerAndCircle([state.lat, state.lng], state.radius);
-            } else if (coordinates.Latitudine && coordinates.Longitudine) {
-                addMarkerAndCircle([coordinates.Latitudine, coordinates.Longitudine], selectedRadius);
+            if (typeof window.addMarkerAndCircle === 'function' && coordinates.Latitudine && coordinates.Longitudine) {
+                window.addMarkerAndCircle([coordinates.Latitudine, coordinates.Longitudine], selectedRadius);
             }
-        });
-
-        $('#consentCheckbox').on('change', function() {
-            consentFilter = this.checked;
-            saveMapState();
-        });
+        }
     }
 
     function save() {
@@ -95,7 +96,8 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             "EmailAddress": "{{InteractionDefaults.Email}}",
             "consentFilter": consentFilter,
             "Consenso": "{{Contact.Attribute.LongitudineLatitudine.Consenso}}",
-            "selectedRadius": selectedRadius
+            "selectedRadius": selectedRadius,
+            "selectedAddress": selectedAddress
         }];
 
         payload['metaData'].isConfigured = true;
@@ -136,7 +138,8 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             lat: coordinates.Latitudine,
             lng: coordinates.Longitudine,
             radius: selectedRadius,
-            consentFilter: consentFilter
+            consentFilter: consentFilter,
+            address: selectedAddress
         };
         localStorage.setItem('mapState', JSON.stringify(mapState));
     }
