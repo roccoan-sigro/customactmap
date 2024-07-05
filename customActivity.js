@@ -8,7 +8,6 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
     var selectedAddress = '';
     var selectedRadius = 50;
     var consentFilter = true;
-    var estimatedRecordCount = 0;
 
     $(window).ready(onRender);
 
@@ -41,13 +40,11 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             selectedRadius = state.radius;
             consentFilter = state.consentFilter;
             selectedAddress = state.address || '';
-            estimatedRecordCount = state.estimatedRecordCount || 0;
 
             $('#consentCheckbox').prop('checked', consentFilter);
             $('#radiusSlider').val(selectedRadius);
             $('#radiusInput').val(selectedRadius);
             $('#address').text('Indirizzo: ' + selectedAddress);
-            $('#recordCount').text(estimatedRecordCount);
 
             if (typeof window.addMarkerAndCircle === 'function') {
                 window.addMarkerAndCircle([state.lat, state.lng], state.radius);
@@ -68,25 +65,16 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             selectedRadius = inArguments.selectedRadius || 50;
             consentFilter = inArguments.consentFilter !== undefined ? inArguments.consentFilter : true;
             selectedAddress = inArguments.selectedAddress || '';
-            estimatedRecordCount = inArguments.estimatedRecordCount || 0;
 
             $('#consentCheckbox').prop('checked', consentFilter);
             $('#radiusSlider').val(selectedRadius);
             $('#radiusInput').val(selectedRadius);
             $('#address').text('Indirizzo: ' + selectedAddress);
-            $('#recordCount').text(estimatedRecordCount);
 
             if (typeof window.addMarkerAndCircle === 'function' && coordinates.Latitudine && coordinates.Longitudine) {
                 window.addMarkerAndCircle([coordinates.Latitudine, coordinates.Longitudine], selectedRadius);
             }
         }
-
-        // Aggiungi listener per la checkbox del consenso
-        $('#consentCheckbox').on('change', function() {
-            consentFilter = this.checked;
-            saveMapState();
-            updateEstimatedRecordCount();
-        });
     }
 
     function save() {
@@ -109,14 +97,13 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             "consentFilter": consentFilter,
             "Consenso": "{{Contact.Attribute.LongitudineLatitudine.Consenso}}",
             "selectedRadius": selectedRadius,
-            "selectedAddress": selectedAddress,
-            "estimatedRecordCount": estimatedRecordCount
+            "selectedAddress": selectedAddress
         }];
 
         payload['metaData'].isConfigured = true;
 
         var consentLabel = consentFilter ? " (solo con consenso)" : "";
-        payload['outcomes'][0].metaData.label = `${selectedAddress}, ${selectedRadius}m${consentLabel}, ${estimatedRecordCount} record stimati`;
+        payload['outcomes'][0].metaData.label = `${selectedAddress}, ${selectedRadius}m${consentLabel}`;
 
         console.log('Saving payload:', JSON.stringify(payload, null, 2));
         connection.trigger('updateActivity', payload);
@@ -126,32 +113,12 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
         console.log('New coordinates updated:', newCoordinates);
         coordinates = newCoordinates;
         saveMapState();
-        updateEstimatedRecordCount();
     }
 
     function updateAddressAndRadius(address, radius) {
         selectedAddress = address;
         selectedRadius = radius;
         saveMapState();
-        updateEstimatedRecordCount();
-    }
-
-    function updateEstimatedRecordCount() {
-        // Implementa la logica per aggiornare il conteggio stimato dei record
-        // Questo è un esempio, dovrai adattarlo alla tua logica effettiva
-        if (typeof window.countRecords === 'function') {
-            window.countRecords(
-                coordinates.minLatitude,
-                coordinates.maxLatitude,
-                coordinates.minLongitude,
-                coordinates.maxLongitude,
-                function(count) {
-                    estimatedRecordCount = count;
-                    $('#recordCount').text(count);
-                    saveMapState();
-                }
-            );
-        }
     }
 
     function initializeMap(callback) {
@@ -172,8 +139,7 @@ define('customActivity', ['jquery', 'postmonger'], function ($, Postmonger) {
             lng: coordinates.Longitudine,
             radius: selectedRadius,
             consentFilter: consentFilter,
-            address: selectedAddress,
-            estimatedRecordCount: estimatedRecordCount
+            address: selectedAddress
         };
         localStorage.setItem('mapState', JSON.stringify(mapState));
     }
